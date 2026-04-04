@@ -11,7 +11,6 @@ interface Category {
 
 const App = () => {
   const [categories, setCategories] = useState<Category[]>([])
-  const [showAll, setShowAll] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -54,7 +53,7 @@ const App = () => {
     fetchCategories();
   }, [])
 
-  const visibleCategories = showAll ? categories : categories.slice(0, 8)
+  const visibleCategories = categories
 
   return (
     <div className="min-h-screen font-sans">
@@ -152,34 +151,14 @@ const App = () => {
           </AnimatePresence>
         </div>
 
-        {/* View All Button */}
-        {!showAll && categories.length > 8 && (
-          <div className="mt-16 flex justify-center">
-            <button 
-              onClick={() => setShowAll(true)}
-              className="group flex flex-col items-center gap-4 premium-btn"
-            >
-              <span>View All Programs</span>
-              <motion.div
-                animate={{ y: [0, 4, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                <ChevronDown className="w-5 h-5" />
-              </motion.div>
-            </button>
-          </div>
-        )}
-
-        {/* Scroll Effect Indication for the second half */}
-        {showAll && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-12 text-center text-gold/40 text-sm font-medium italic underline decoration-gold/20"
-          >
-            Smooth scroll effect enabled for browsing all 16 collections
-          </motion.div>
-        )}
+        {/* Scroll Effect Indication */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-12 text-center text-gold/40 text-sm font-medium italic underline decoration-gold/20"
+        >
+          Scroll to explore all 16 collections
+        </motion.div>
       </main>
 
       {/* Footer */}
