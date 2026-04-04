@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-parchment transition-colors duration-300;
+  }
+}
+
+@layer components {
+  .premium-card {
+    @apply bg-cream rounded-xl border border-gold/30 shadow-card 
+           transition-all duration-300 hover:shadow-premium hover:-translate-y-1
+           flex flex-col items-center justify-center p-6 text-center cursor-pointer;
+  }
+
+  .premium-btn {
+    @apply bg-leather text-white font-semibold py-3 px-8 rounded-full 
+           shadow-lg transition-all duration-300 hover:bg-leather-dark 
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-gold/50;
+  }
+
+  .nav-link {
+    @apply text-leather font-medium hover:text-gold transition-colors duration-200 relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 w-0 h-0.5 bg-gold transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-parchment;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gold/50 rounded-full hover:bg-gold;
+}
