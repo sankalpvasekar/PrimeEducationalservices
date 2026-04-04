@@ -1,9 +1,10 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, GraduationCap, Loader2, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,7 +52,11 @@ export default function LoginPage() {
       }
 
       toast.success(`Welcome back, ${data.user.name}!`);
-      router.push('/dashboard');
+      if (data.user.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -60,15 +65,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FDFBF7] via-[#F5F2EA] to-[#FFFBF2] flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center p-4">
       <div className="auth-card">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="bg-[#C5A059] p-3 rounded-2xl shadow-lg mb-3">
-            <GraduationCap className="text-white w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-[family-name:var(--font-playfair)] font-bold text-[#3E2723]">Prime Educational</h1>
-          <p className="text-[#A1887F] text-sm mt-1">Sign in to your account</p>
+        <div className="flex flex-col items-center mb-10">
+          <Link href="/">
+            <Image 
+              src="/navbar.png" 
+              alt="Logo" 
+              width={200} 
+              height={55} 
+              className="object-contain mb-2 cursor-pointer" 
+            />
+          </Link>
+          <p className="text-[#A1887F] text-xs font-bold uppercase tracking-widest">Premium Study Portal</p>
         </div>
 
         {warning && (

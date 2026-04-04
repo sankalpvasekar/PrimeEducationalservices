@@ -1,11 +1,38 @@
-import { Pool } from 'pg';
+import pg, { Pool } from 'pg';
+import fs from 'fs';
+import path from 'path';
+import bcrypt from 'bcryptjs';
+
+// Removed redundant local Pool declaration
+
+// 🛡️ Robust Environment Loader for maintenance scripts
+if (!process.env.DATABASE_URL) {
+  const envPath = path.join(process.cwd(), '.env.local');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach(line => {
+      const parts = line.split('=');
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join('=').trim();
+        if (key && value) process.env[key] = value;
+      }
+    });
+  }
+}
+
+const connectionString = process.env.DATABASE_URL;
+if (connectionString) {
+  const masked = connectionString.replace(/:[^:@]+@/, ':****@');
+  console.log(`📡 Connecting to DB: ${masked}`);
+}
 
 const globalForDb = global as unknown as { pool: Pool };
 
 export const pool =
   globalForDb.pool ||
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     ssl: { rejectUnauthorized: false },
     max: 10,
   });
@@ -16,12 +43,18 @@ export async function query<T = Record<string, unknown>>(
   text: string,
   params?: unknown[]
 ): Promise<T[]> {
-  const client = await pool.connect();
+  const start = Date.now();
   try {
-    const res = await client.query(text, params);
+    const res = await pool.query(text, params);
+    const duration = Date.now() - start;
+    if (process.env.DEBUG_DB) console.log('executed query', { text, duration, rows: res.rowCount });
     return res.rows as T[];
-  } finally {
-    client.release();
+  } catch (err: any) {
+    console.error('❌ DB Query Error:', err.message);
+    if (err.message.includes('SSL')) {
+      console.log('💡 TIP: Try adding "?sslmode=require" to your DATABASE_URL in .env.local if not present.');
+    }
+    throw err;
   }
 }
 
@@ -67,7 +100,32 @@ export async function initDB() {
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
       subtitle VARCHAR(255),
+      description TEXT,
+      banner_url TEXT,
       is_premium BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+  `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS pdfs (
+      id SERIAL PRIMARY KEY,
+      section_id INTEGER REFERENCES exam_categories(id) ON DELETE CASCADE,
+      title VARCHAR(255) NOT NULL,
+      price DECIMAL(10, 2) DEFAULT 0.00,
+      cloudinary_url TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+  `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS purchases (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      section_id INTEGER REFERENCES exam_categories(id) ON DELETE CASCADE,
+      payment_id VARCHAR(255),
+      amount DECIMAL(10, 2),
+      status VARCHAR(50) DEFAULT 'success',
       created_at TIMESTAMP DEFAULT NOW()
     );
   `);
@@ -88,7 +146,7 @@ export async function initDB() {
       ['SSC', '(CGL, CHSL, MTS)'],
       ['Banking', '(IBPS, SBI, RBI)'],
       ['Railway', '(RRB NTPC, Group-D)'],
-      ['Defence', '(NDA, CDS, Army, Navy, Airforce)'],
+      [' Defence', '(NDA, CDS, Army, Navy, Airforce)'],
       ['TET / CTET', '/ Teacher Bharti'],
       ['Speaking English', '(Communication Skills)'],
       ['Business Ideas', '(Startup Ideas)'],
@@ -96,5 +154,36 @@ export async function initDB() {
     for (const [title, subtitle] of categories) {
       await query('INSERT INTO exam_categories (title, subtitle) VALUES ($1, $2)', [title, subtitle]);
     }
+  }
+
+  // 🛡️ Auto-sync Superuser from .env.local
+  await syncAdminUser();
+}
+
+export async function syncAdminUser() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.log('⚠️ ADMIN_EMAIL or ADMIN_PASSWORD missing in .env.local. Skipping superuser sync.');
+    return;
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(adminPassword, salt);
+
+    await query(`
+      INSERT INTO users (name, email, password_hash, is_admin, is_blocked, device_switch_count)
+      VALUES ('Super Admin', $1, $2, true, false, 0)
+      ON CONFLICT (email) DO UPDATE SET 
+        is_admin = true, 
+        password_hash = EXCLUDED.password_hash, 
+        is_blocked = false;
+    `, [adminEmail, hash]);
+
+    console.log(`✅ Superuser synchronized: ${adminEmail}`);
+  } catch (err: any) {
+    console.error('❌ Superuser sync failed:', err.message);
   }
 }

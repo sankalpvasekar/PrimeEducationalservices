@@ -6,6 +6,7 @@ const EXPIRES_IN = '30d';
 export interface JWTPayload {
   userId: number;
   email: string;
+  name: string;
   isAdmin: boolean;
   deviceId: string;
 }
