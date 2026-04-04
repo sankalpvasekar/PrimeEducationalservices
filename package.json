@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node -v && npm ls react && next build",
+    "build": "NEXT_TELEMETRY_DISABLED=1 node -v && npm ls react && next build --debug",
     "start": "next start",
     "lint": "eslint"
   },
