@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+venv/
+.env
+
+# Project
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.bak
