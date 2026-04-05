@@ -130,89 +130,85 @@ export default function SectionPage() {
   const { section, pdfs, isPurchased } = data;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       
-      {/* Banner & Header */}
-      <div className="relative min-h-[250px] lg:min-h-[350px] w-full flex items-end">
-        {section.banner_url ? (
-          <Image src={section.banner_url} alt={section.title} fill unoptimized className="object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-[#3E2723] flex items-center justify-center">
-             <Image src="/navbar.png" alt="Logo" width={150} height={45} unoptimized className="opacity-20 grayscale brightness-200" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723] via-transparent/20 to-black/40"></div>
-        
-        <Link href="/" className="absolute top-6 left-6 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all z-20">
-           <ChevronLeft size={24} />
+      <main className="max-w-xl mx-auto px-6 pt-10">
+        {/* Back Button */}
+        <Link href="/" className="inline-flex items-center gap-2 text-[#A1887F] hover:text-[#C5A059] mb-8 transition-colors">
+          <ChevronLeft size={20} />
+          <span className="text-sm font-bold uppercase tracking-widest">Back</span>
         </Link>
 
-        <div className="relative p-8 md:p-12 text-white z-10 w-full max-w-4xl mx-auto">
-           <div className="flex flex-col gap-2">
-             <span className="self-start text-[10px] font-black uppercase tracking-[0.2em] bg-[#C5A059] px-3 py-1 rounded-full shadow-xl">Premium Catalog</span>
-             <h1 className="text-4xl md:text-5xl font-[family-name:var(--font-playfair)] font-black leading-tight drop-shadow-md">{section.title}</h1>
-             <p className="text-sm md:text-base text-white/90 font-medium max-w-xl leading-relaxed">{section.subtitle}</p>
-           </div>
+        {/* Section Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#3E2723]">{section.title}</h1>
+          {section.subtitle && <p className="text-sm text-[#A1887F] mt-2 font-medium">{section.subtitle}</p>}
         </div>
-      </div>
 
-      <main className="max-w-2xl mx-auto px-6 -mt-8 relative z-30 mb-20">
-        {/* Buy Now Section - Visible ONLY if NOT purchased */}
-        {!isPurchased ? (
-          <div className="bg-white rounded-[2.5rem] border border-[#C5A059]/20 p-8 md:p-10 text-center shadow-2xl space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-[family-name:var(--font-playfair)] font-bold text-[#3E2723]">Unlock Full Access</h2>
-              <p className="text-[#A1887F] text-sm font-medium leading-relaxed">
-                Purchase this entire section to instantly unlock all <b>{pdfs.length} premium modules</b> and study materials.
-              </p>
+        {/* Poster Image Container */}
+        <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-10">
+          {section.banner_url ? (
+            <div className="w-full flex justify-center bg-white">
+              <img 
+                src={section.banner_url} 
+                alt={section.title} 
+                className="w-full h-auto object-contain"
+              />
             </div>
+          ) : (
+            <div className="aspect-video bg-[#FDFBF7] flex items-center justify-center">
+               <Image src="/navbar.png" alt="Logo" width={150} height={45} unoptimized className="opacity-20 grayscale" />
+            </div>
+          )}
+        </div>
 
+        {/* Action Area */}
+        {!isPurchased ? (
+          <div className="flex flex-col items-center gap-8">
             <button 
                disabled={processingPayment}
-               className="w-full py-5 bg-[#C5A059] text-white rounded-2xl font-black text-xl hover:bg-[#A68344] transition-all shadow-[0_10px_40px_-10px_rgba(197,160,89,0.5)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
+               className="w-full py-4 md:py-5 bg-[#C5A059] text-white rounded-[2rem] font-bold text-xl md:text-2xl hover:bg-[#A68344] transition-all shadow-[0_15px_35px_-5px_rgba(197,160,89,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
                onClick={handlePayment}
             >
-               {processingPayment ? <Loader2 className="animate-spin" /> : <ShoppingCart size={24} />}
+               {processingPayment ? <Loader2 className="animate-spin" /> : null}
                Buy Now — ₹499
             </button>
 
-            <div className="flex items-center justify-center gap-6 pt-2">
-               <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#A1887F] uppercase tracking-widest">
-                  <ShieldCheck size={14} className="text-[#C5A059]" /> Secured
+            <div className="flex items-center gap-6 text-[#A1887F]/40">
+               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                  <ShieldCheck size={14} className="text-[#C5A059]/60" /> Secure
                </div>
-               <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#A1887F] uppercase tracking-widest">
-                  <FileText size={14} className="text-[#C5A059]" /> Lifetime
+               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                  <FileText size={14} className="text-[#C5A059]/60" /> Lifetime
                </div>
             </div>
           </div>
         ) : (
-          /* PDF List - Visible ONLY if purchased */
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+          /* Purchased Content */
+          <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
             <div className="flex items-center justify-between border-b border-[#C5A059]/10 pb-4">
               <h3 className="text-xl font-bold text-[#3E2723] flex items-center gap-3">
-                 <FileText className="text-[#C5A059]" size={24} /> Your Curriculum
+                 <FileText className="text-[#C5A059]" size={24} /> Materials
               </h3>
-              <span className="text-[10px] font-black text-[#C5A059] bg-[#C5A059]/5 px-3 py-1 rounded-full uppercase tracking-widest">{pdfs.length} Modules</span>
+              <span className="text-[10px] font-black text-white bg-[#C5A059] px-3 py-1 rounded-full uppercase tracking-widest">{pdfs.length} Modules</span>
             </div>
 
             <div className="grid gap-4">
               {pdfs.map((pdf) => (
                 <div 
                   key={pdf.id} 
-                  className="bg-white rounded-2xl border border-[#C5A059]/10 p-5 flex items-center gap-5 hover:shadow-xl hover:border-[#C5A059]/30 cursor-pointer transition-all active:scale-[0.99] group"
+                  className="bg-[#FDFBF7] rounded-3xl border border-[#C5A059]/10 p-6 flex items-center gap-5 hover:shadow-lg hover:border-[#C5A059]/30 cursor-pointer transition-all active:scale-[0.99] group"
                   onClick={() => router.push(`/view/${pdf.id}`)}
                 >
-                  <div className="bg-[#5D4037]/5 p-3.5 rounded-2xl group-hover:bg-[#C5A059]/10 transition-colors">
-                     <FileText className="text-[#5D4037] group-hover:text-[#C5A059]" size={28} />
+                  <div className="bg-white p-3.5 rounded-2xl shadow-sm">
+                     <FileText className="text-[#C5A059]" size={28} />
                   </div>
                   <div className="flex-1">
                      <h4 className="font-bold text-[#3E2723] text-lg">{pdf.title}</h4>
-                     <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest mt-0.5">Unlocked Material</p>
+                     <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest mt-0.5">Ready to view</p>
                   </div>
-                  <div className="w-10 h-10 flex items-center justify-center text-[#C5A059]/20 group-hover:text-[#C5A059] transition-colors">
-                    <ChevronLeft size={20} className="rotate-180" />
-                  </div>
+                  <ChevronLeft size={20} className="rotate-180 text-[#C5A059]/40 group-hover:text-[#C5A059]" />
                 </div>
               ))}
             </div>
