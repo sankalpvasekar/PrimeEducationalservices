@@ -134,34 +134,36 @@ export default function SectionPage() {
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       
       {/* Banner & Header */}
-      <div className="relative h-[250px] w-full lg:h-[350px]">
+      <div className="relative h-[160px] w-full lg:h-[220px]">
         {section.banner_url ? (
           <Image src={section.banner_url} alt={section.title} fill className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-[#3E2723] flex items-center justify-center">
-             <Image src="/navbar.png" alt="Logo" width={200} height={60} className="opacity-20 grayscale brightness-200" />
+             <Image src="/navbar.png" alt="Logo" width={150} height={45} className="opacity-20 grayscale brightness-200" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723] via-transparent to-black/30"></div>
         
-        <Link href="/" className="absolute top-6 left-6 p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
-           <ChevronLeft size={24} />
+        <Link href="/" className="absolute top-4 left-4 p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all z-10">
+           <ChevronLeft size={20} />
         </Link>
 
-        <div className="absolute bottom-8 left-8 right-8 text-white">
-           <span className="text-[10px] font-bold uppercase tracking-widest bg-[#C5A059] px-3 py-1 rounded-full mb-3 inline-block shadow-lg">Premium Section</span>
-           <h1 className="text-3xl md:text-5xl font-[family-name:var(--font-playfair)] font-bold mb-2">{section.title}</h1>
-           <p className="text-sm text-white/80 font-medium">{section.subtitle}</p>
+        <div className="absolute bottom-4 left-6 right-6 text-white z-10 flex flex-col justify-end">
+           <div className="self-start">
+             <span className="text-[10px] font-bold uppercase tracking-widest bg-[#C5A059] px-2.5 py-0.5 rounded-full mb-1.5 inline-block shadow-lg">Premium Section</span>
+           </div>
+           <h1 className="text-2xl md:text-3xl font-[family-name:var(--font-playfair)] font-bold leading-tight">{section.title}</h1>
+           <p className="text-xs text-white/80 font-medium mt-0.5">{section.subtitle}</p>
         </div>
       </div>
 
-      <main className="max-w-2xl mx-auto px-6 mt-10">
+      <main className="max-w-2xl mx-auto px-6 mt-6">
         {/* Buy Now Section */}
         {!isPurchased && (
-          <div className="bg-[#FFFBF2] rounded-3xl border-2 border-[#C5A059]/20 p-8 text-center mb-10 shadow-xl relative overflow-hidden">
+          <div className="bg-[#FFFBF2] rounded-3xl border-2 border-[#C5A059]/20 p-6 text-center mb-8 shadow-xl relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#C5A059]/5 rounded-full blur-2xl"></div>
-            <h2 className="text-2xl font-[family-name:var(--font-playfair)] font-bold text-[#3E2723] mb-3">Unlock This Section</h2>
-            <p className="text-[#A1887F] text-sm font-medium mb-8 leading-relaxed">
+            <h2 className="text-xl font-[family-name:var(--font-playfair)] font-bold text-[#3E2723] mb-2">Unlock This Section</h2>
+            <p className="text-[#A1887F] text-xs font-medium mb-6 leading-relaxed">
               Get full lifetime access to all {pdfs.length} premium PDF study modules in the {section.title} category.
             </p>
             <button 
