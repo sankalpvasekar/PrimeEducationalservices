@@ -46,6 +46,9 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      // Notify Navbar of auth change
+      window.dispatchEvent(new Event('auth-change'));
+
       if (data.warning) {
         setWarning(data.warning);
         toast(data.warning, { icon: '⚠️', duration: 5000 });

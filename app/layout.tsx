@@ -12,10 +12,7 @@ export const metadata: Metadata = {
   title: 'Prime Educational Services',
   description: 'Premium Study Notes & PDF Material',
   icons: {
-    icon: [
-      { url: '/title.jpeg', href: '/title.jpeg' },
-    ],
-    shortcut: '/title.jpeg',
+    icon: '/title.jpeg',
     apple: '/title.jpeg',
   },
 };

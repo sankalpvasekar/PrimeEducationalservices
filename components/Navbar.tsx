@@ -20,20 +20,35 @@ export default function Navbar() {
       const storedUser = localStorage.getItem('user');
       setIsLogged(!!token);
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
     };
     checkAuth();
-    // Refresh check on focus (for when user returns from login tab)
+    
+    // Listen for cross-tab or same-window authentication updates
     window.addEventListener('focus', checkAuth);
-    return () => window.removeEventListener('focus', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('auth-change', checkAuth);
+
+    return () => {
+      window.removeEventListener('focus', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('auth-change', checkAuth);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
+    // Notify app of auth change
+    window.dispatchEvent(new Event('auth-change'));
+
     // Call server-side logout to clear httpOnly cookie
     fetch('/api/auth/logout', { method: 'POST' }).finally(() => {
       setIsLogged(false);
