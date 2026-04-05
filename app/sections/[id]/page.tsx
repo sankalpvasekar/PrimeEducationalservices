@@ -157,14 +157,14 @@ export default function SectionPage() {
         </div>
       </div>
 
-      <main className="max-w-2xl mx-auto px-6 -mt-8 relative z-30">
+      <main className="max-w-2xl mx-auto px-6 -mt-8 relative z-30 mb-20">
         {/* Buy Now Section - Visible ONLY if NOT purchased */}
         {!isPurchased ? (
           <div className="bg-white rounded-[2.5rem] border border-[#C5A059]/20 p-8 md:p-10 text-center shadow-2xl space-y-6">
             <div className="space-y-2">
               <h2 className="text-2xl font-[family-name:var(--font-playfair)] font-bold text-[#3E2723]">Unlock Full Access</h2>
               <p className="text-[#A1887F] text-sm font-medium leading-relaxed">
-                Purchase this section to instantly unlock all <b>{pdfs.length} modules</b> and study materials.
+                Purchase this entire section to instantly unlock all <b>{pdfs.length} premium modules</b> and study materials.
               </p>
             </div>
 
