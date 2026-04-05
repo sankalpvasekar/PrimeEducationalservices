@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Upload, FileText, Image as ImageIcon, Loader2, ArrowLeft, Trash2, CheckCircle2, MoreVertical, Plus, Eye } from 'lucide-react';
+import { ShieldCheck, Upload, FileText, Image as ImageIcon, Loader2, ArrowLeft, Trash2, CheckCircle2, MoreVertical, Plus, Eye, Pencil, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -57,6 +57,9 @@ export default function AdminDashboard() {
   const [pdfPrice, setPdfPrice] = useState('499');
   const [editTitle, setEditTitle] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
+  const [editingPdfId, setEditingPdfId] = useState<number | null>(null);
+  const [editPdfTitle, setEditPdfTitle] = useState('');
+  const [editPdfPrice, setEditPdfPrice] = useState('');
 
   const handleFatalAuth = useCallback(() => {
     localStorage.removeItem('auth_token');
@@ -213,6 +216,33 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUpdatePdf = async (pdfId: number) => {
+    try {
+      const res = await fetch('/api/admin/pdfs', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pdfId, title: editPdfTitle, price: editPdfPrice })
+      });
+      if (res.ok) {
+        toast.success('PDF updated');
+        setEditingPdfId(null);
+        if (selectedCat) {
+           const resP = await fetch(`/api/admin/pdfs?sectionId=${selectedCat}`);
+           const d = await resP.json();
+           setPdfs(d.pdfs || []);
+        }
+      }
+    } catch (err) {
+      toast.error('Update failed');
+    }
+  };
+
+  const startEditingPdf = (pdf: Pdf) => {
+    setEditingPdfId(pdf.id);
+    setEditPdfTitle(pdf.title);
+    setEditPdfPrice(pdf.price);
+  };
+
   const handleDeletePdf = async (pdfId: number) => {
     if (!confirm('Are you sure you want to delete this PDF?')) return;
     try {
@@ -353,7 +383,24 @@ export default function AdminDashboard() {
                        <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest self-start pl-1 mb-1">Section Banner</label>
                        <div className="w-full aspect-[2/1] relative bg-[#FDFBF7] border-2 border-dashed border-[#C5A059]/30 rounded-3xl overflow-hidden group">
                          {categories.find(c => c.id === selectedCat)?.banner_url ? (
-                           <Image src={categories.find(c => c.id === selectedCat)!.banner_url!} alt="Banner" fill className="object-cover transition-transform group-hover:scale-105" />
+                           <div className="relative w-full h-full">
+                             <Image 
+                               src={categories.find(c => c.id === selectedCat)!.banner_url!} 
+                               alt="Banner" 
+                               fill 
+                               unoptimized
+                               className="object-cover transition-transform group-hover:scale-105" 
+                             />
+                             <div className="absolute top-2 right-2 flex gap-2">
+                               <a 
+                                 href={categories.find(c => c.id === selectedCat)!.banner_url} 
+                                 target="_blank" 
+                                 className="bg-white/90 p-1.5 rounded-lg text-[10px] font-bold text-[#5D4037] shadow-sm hover:bg-white"
+                               >
+                                 Open Raw
+                               </a>
+                             </div>
+                           </div>
                          ) : (
                            <div className="absolute inset-0 flex flex-col items-center justify-center text-[#C5A059]/40">
                              <ImageIcon size={48} className="mb-2" />
@@ -382,20 +429,49 @@ export default function AdminDashboard() {
                         <div key={pdf.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#FDFBF7] rounded-2xl border border-[#C5A059]/10 group gap-3">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div className="p-2.5 bg-white rounded-xl border border-[#C5A059]/10 text-[#C5A059] shadow-sm flex-shrink-0"><FileText size={20} /></div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-bold text-[#5D4037] truncate">{pdf.title}</p>
-                              <p className="text-[11px] font-bold text-[#A1887F] mt-0.5">₹{pdf.price}</p>
+                            <div className="min-w-0 flex-1">
+                              {editingPdfId === pdf.id ? (
+                                <div className="space-y-2">
+                                  <input 
+                                    className="w-full bg-white border border-[#C5A059]/30 rounded-lg px-2 py-1 text-sm font-bold text-[#5D4037] outline-none"
+                                    value={editPdfTitle} onChange={e => setEditPdfTitle(e.target.value)}
+                                  />
+                                  <input 
+                                    type="number" className="w-24 bg-white border border-[#C5A059]/30 rounded-lg px-2 py-1 text-xs text-[#A1887F] outline-none"
+                                    value={editPdfPrice} onChange={e => setEditPdfPrice(e.target.value)}
+                                  />
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-bold text-[#5D4037] truncate">{pdf.title}</p>
+                                  <p className="text-[11px] font-bold text-[#A1887F] mt-0.5">₹{pdf.price}</p>
+                                </>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 justify-end sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
-                            {pdf.cloudinary_url && (
-                              <a href={pdf.cloudinary_url} target="_blank" rel="noopener noreferrer" className="p-2 text-[#C5A059] hover:text-[#5D4037] bg-white rounded-lg border border-[#C5A059]/20" title="Review PDF">
-                                <Eye size={16} />
-                              </a>
+                            {editingPdfId === pdf.id ? (
+                              <>
+                                <button onClick={() => handleUpdatePdf(pdf.id)} className="p-2 text-emerald-600 hover:text-emerald-700 bg-white rounded-lg border border-emerald-100" title="Save Changes">
+                                  <Check size={16} />
+                                </button>
+                                <button onClick={() => setEditingPdfId(null)} className="p-2 text-red-500 hover:text-red-600 bg-white rounded-lg border border-red-100" title="Cancel">
+                                  <X size={16} />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => startEditingPdf(pdf)} className="p-2 text-[#C5A059] hover:text-[#5D4037] bg-white rounded-lg border border-[#C5A059]/20" title="Edit Info">
+                                  <Pencil size={16} />
+                                </button>
+                                <Link href={`/view/${pdf.id}`} target="_blank" className="p-2 text-[#C5A059] hover:text-[#5D4037] bg-white rounded-lg border border-[#C5A059]/20" title="Review PDF">
+                                  <Eye size={16} />
+                                </Link>
+                                <button onClick={() => handleDeletePdf(pdf.id)} className="p-2 text-red-500 hover:text-red-700 bg-white rounded-lg border border-red-100" title="Delete PDF">
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
                             )}
-                            <button onClick={() => handleDeletePdf(pdf.id)} className="p-2 text-red-500 hover:text-red-700 bg-white rounded-lg border border-red-100" title="Delete PDF">
-                              <Trash2 size={16} />
-                            </button>
                           </div>
                         </div>
                       ))}

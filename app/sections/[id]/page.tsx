@@ -136,10 +136,10 @@ export default function SectionPage() {
       {/* Banner & Header */}
       <div className="relative h-[160px] w-full lg:h-[220px]">
         {section.banner_url ? (
-          <Image src={section.banner_url} alt={section.title} fill className="object-cover" />
+          <Image src={section.banner_url} alt={section.title} fill unoptimized className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-[#3E2723] flex items-center justify-center">
-             <Image src="/navbar.png" alt="Logo" width={150} height={45} className="opacity-20 grayscale brightness-200" />
+             <Image src="/navbar.png" alt="Logo" width={150} height={45} unoptimized className="opacity-20 grayscale brightness-200" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723] via-transparent to-black/30"></div>
