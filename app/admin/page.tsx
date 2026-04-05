@@ -379,39 +379,40 @@ export default function AdminDashboard() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {pdfs.map((pdf) => (
-                        <div key={pdf.id} className="flex items-center justify-between p-4 bg-[#FDFBF7] rounded-2xl border border-[#C5A059]/10 group">
-                          <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white rounded-2xl border border-[#C5A059]/10 text-[#C5A059] shadow-sm"><FileText size={22} /></div>
-                            <div>
-                              <p className="text-sm font-bold text-[#5D4037]">{pdf.title}</p>
+                        <div key={pdf.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#FDFBF7] rounded-2xl border border-[#C5A059]/10 group gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="p-2.5 bg-white rounded-xl border border-[#C5A059]/10 text-[#C5A059] shadow-sm flex-shrink-0"><FileText size={20} /></div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-[#5D4037] truncate">{pdf.title}</p>
                               <p className="text-[11px] font-bold text-[#A1887F] mt-0.5">₹{pdf.price}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-2 justify-end sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                             {pdf.cloudinary_url && (
-                              <a href={pdf.cloudinary_url} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#C5A059] hover:text-[#5D4037]" title="Review PDF">
+                              <a href={pdf.cloudinary_url} target="_blank" rel="noopener noreferrer" className="p-2 text-[#C5A059] hover:text-[#5D4037] bg-white rounded-lg border border-[#C5A059]/20" title="Review PDF">
                                 <Eye size={16} />
                               </a>
                             )}
-                            <button onClick={() => handleDeletePdf(pdf.id)} className="p-2.5 text-[#A1887F] hover:text-red-500" title="Delete PDF">
+                            <button onClick={() => handleDeletePdf(pdf.id)} className="p-2 text-red-500 hover:text-red-700 bg-white rounded-lg border border-red-100" title="Delete PDF">
                               <Trash2 size={16} />
                             </button>
                           </div>
                         </div>
                       ))}
                       
-                      <div className="p-5 bg-white border-2 border-dashed border-[#C5A059]/20 rounded-[1.5rem] space-y-4">
+                      <div className="p-4 bg-white border-2 border-dashed border-[#C5A059]/20 rounded-[1.5rem] space-y-3 flex flex-col justify-center">
                          <input 
                            type="text" placeholder="Material Title" 
-                           className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
+                           className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-3 py-2 text-xs focus:outline-none"
                            value={pdfTitle} onChange={e => setPdfTitle(e.target.value)}
                          />
-                         <div className="flex gap-2">
+                         <div className="flex flex-col sm:flex-row gap-2">
                             <input 
-                              type="number" className="w-20 bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-3 py-2.5 text-xs"
+                              type="number" className="w-full sm:w-20 bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-3 py-2 text-xs focus:outline-none"
                               value={pdfPrice} onChange={e => setPdfPrice(e.target.value)}
+                              placeholder="Price"
                             />
-                            <label className="flex-1 py-2.5 bg-[#5D4037] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer">
+                            <label className="flex-1 py-2 bg-[#5D4037] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md">
                               {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />} {uploading ? 'Syncing...' : 'Add PDF'}
                               <input type="file" className="hidden" accept=".pdf" onChange={handlePdfUpload} disabled={uploading} />
                             </label>
