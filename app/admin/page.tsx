@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Upload, FileText, Image as ImageIcon, Loader2, ArrowLeft, Trash2, CheckCircle2, MoreVertical, Plus } from 'lucide-react';
+import { ShieldCheck, Upload, FileText, Image as ImageIcon, Loader2, ArrowLeft, Trash2, CheckCircle2, MoreVertical, Plus, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -387,9 +387,16 @@ export default function AdminDashboard() {
                               <p className="text-[11px] font-bold text-[#A1887F] mt-0.5">₹{pdf.price}</p>
                             </div>
                           </div>
-                          <button onClick={() => handleDeletePdf(pdf.id)} className="p-2.5 text-[#A1887F] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {pdf.cloudinary_url && (
+                              <a href={pdf.cloudinary_url} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#C5A059] hover:text-[#5D4037]" title="Review PDF">
+                                <Eye size={16} />
+                              </a>
+                            )}
+                            <button onClick={() => handleDeletePdf(pdf.id)} className="p-2.5 text-[#A1887F] hover:text-red-500" title="Delete PDF">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                       
