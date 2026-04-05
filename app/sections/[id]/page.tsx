@@ -39,6 +39,13 @@ export default function SectionPage() {
       const res = await fetch(`/api/sections/${id}`);
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
+      
+      // If purchased, redirect to the new "Plain Page" curriculum view
+      if (result.isPurchased) {
+        router.replace(`/curriculum/${id}`);
+        return;
+      }
+
       setData(result);
     } catch (err: any) {
       toast.error(err.message);
@@ -95,7 +102,7 @@ export default function SectionPage() {
           const verifyResult = await verifyRes.json();
           if (verifyRes.ok) {
             toast.success('Payment Successful! Library Unlocked.');
-            fetchSection(); // Refresh to unlock PDFs
+            router.push(`/curriculum/${data.section.id}`);
           } else {
             toast.error(verifyResult.error || 'Verification failed');
           }
