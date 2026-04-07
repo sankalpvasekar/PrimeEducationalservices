@@ -37,10 +37,32 @@ export async function DELETE(req: NextRequest) {
     if (!pdfId) return NextResponse.json({ error: 'PDF ID required' }, { status: 400 });
 
     await query('DELETE FROM pdfs WHERE id = $1', [pdfId]);
-
     return NextResponse.json({ success: true, message: 'PDF deleted successfully' });
   } catch (err) {
     console.error('Admin PDF Delete Error:', err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const token = req.cookies.get('auth_token')?.value;
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const payload = verifyToken(token);
+    if (!payload || !payload.isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const { pdfId, title, price } = await req.json();
+    if (!pdfId) return NextResponse.json({ error: 'PDF ID required' }, { status: 400 });
+
+    await query(
+      'UPDATE pdfs SET title = COALESCE($1, title), price = COALESCE($2, price) WHERE id = $3',
+      [title, price, pdfId]
+    );
+
+    return NextResponse.json({ success: true, message: 'PDF updated successfully' });
+  } catch (err) {
+    console.error('Admin PDF Update Error:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

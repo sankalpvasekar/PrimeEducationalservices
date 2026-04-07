@@ -82,36 +82,25 @@ export default function CurriculumPage() {
           </div>
         </div>
 
-        {/* Content Modules */}
+        {/* Content Modules - Redesigned to match Landing Page style */}
         <div className="space-y-6">
-          <div className="grid gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
              {pdfs.length > 0 ? (
-               pdfs.map((pdf) => (
+               pdfs.map((pdf, idx) => (
                  <div 
                    key={pdf.id} 
-                   className="bg-[#FDFBF7] rounded-[2rem] border border-[#C5A059]/10 p-6 flex items-center gap-6 hover:shadow-xl hover:border-[#C5A059]/40 transition-all cursor-pointer group"
+                   className="cursor-pointer"
                    onClick={() => router.push(`/view/${pdf.id}`)}
                  >
-                   <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:scale-105 transition-transform">
-                      <FileText className="text-[#C5A059]" size={32} />
+                   <div className="bg-[#FFFBF2] rounded-2xl border-2 border-[#C5A059] shadow-sm p-6 text-center transition-all duration-300 hover:border-[#C5A059]/40 hover:shadow-md hover:-translate-y-1 active:scale-[0.98]">
+                     <h3 className="text-xl font-bold text-[#3E2723] leading-tight">{pdf.title}</h3>
+                     <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-wider mt-2">Study Material • Unlocked</p>
                    </div>
-                   <div className="flex-1">
-                      <h4 className="font-bold text-[#3E2723] text-lg md:text-xl group-hover:text-[#C5A059] transition-colors">{pdf.title}</h4>
-                      <div className="flex items-center gap-3 mt-1.5">
-                         <span className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest bg-white px-2 py-0.5 rounded-full border border-gray-100 italic">Premium Materials</span>
-                         <span className="text-[10px] text-[#C5A059] font-bold uppercase tracking-widest flex items-center gap-1">
-                            <ShieldCheck size={12} /> Secure Access
-                         </span>
-                      </div>
-                   </div>
-                   <button className="bg-[#C5A059] text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-[#C5A059]/20 hover:bg-[#A68344] active:scale-95 transition-all">
-                      Open Notes
-                   </button>
                  </div>
                ))
              ) : (
-               <div className="text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
-                  <p className="text-[#A1887F] font-medium">No materials found in this section yet.</p>
+               <div className="text-center py-20 bg-[#FDFBF7] rounded-[2.5rem] border-2 border-dashed border-[#C5A059]/20 sm:col-span-2">
+                  <p className="text-[#A1887F] font-medium italic">No materials found in this section yet.</p>
                </div>
              )}
           </div>

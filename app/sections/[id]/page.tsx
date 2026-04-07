@@ -40,11 +40,11 @@ export default function SectionPage() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
       
-      // If purchased, redirect to the new "Plain Page" curriculum view
-      if (result.isPurchased) {
-        router.replace(`/curriculum/${id}`);
-        return;
-      }
+      // Remove automatic redirect, let user see the section page
+      // if (result.isPurchased) {
+      //   router.replace(`/curriculum/${id}`);
+      //   return;
+      // }
 
       setData(result);
     } catch (err: any) {
@@ -176,10 +176,10 @@ export default function SectionPage() {
             <button 
                disabled={processingPayment}
                className="w-full py-4 md:py-5 bg-[#C5A059] text-white rounded-[2rem] font-bold text-xl md:text-2xl hover:bg-[#A68344] transition-all shadow-[0_15px_35px_-5px_rgba(197,160,89,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
-               onClick={handlePayment}
+               onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
             >
                {processingPayment ? <Loader2 className="animate-spin" /> : null}
-               Buy Now — ₹499
+               {isPurchased ? 'Go To PDF (Unlocked)' : 'Buy Now — ₹499'}
             </button>
 
             <div className="flex items-center gap-6 text-[#A1887F]/40">

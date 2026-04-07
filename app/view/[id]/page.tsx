@@ -31,24 +31,34 @@ export default function PDFViewer() {
     fetchPDF();
   }, [id, router]);
 
-  // SECURITY: Focus/Blur Protection
+  // SECURITY: Focus/Blur Protection (Android & Desktop)
   useEffect(() => {
     const handleBlur = () => {
        setIsBlurred(true);
-       toast.error('Content blurred for security.', { id: 'blur-toast' });
+       toast.error('Content hidden for security.', { id: 'blur-toast' });
     };
     const handleFocus = () => setIsBlurred(false);
 
+    // visibilitychange covers task switching / screenshot attempts on many mobile OSs
+    const handleVisibilityChange = () => {
+       if (document.visibilityState === 'hidden') {
+          handleBlur();
+       } else {
+          // Add a slight delay before unblurring to deter rapid screenshotting
+          setTimeout(handleFocus, 500);
+       }
+    };
+
     window.addEventListener('blur', handleBlur);
     window.addEventListener('focus', handleFocus);
-    window.addEventListener('visibilitychange', () => {
-      if (document.hidden) handleBlur();
-      else handleFocus();
-    });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handleBlur); // Critical for mobile
 
     return () => {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handleBlur);
     };
   }, []);
 
@@ -131,8 +141,21 @@ export default function PDFViewer() {
   const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(data.url)}&embedded=true`;
 
   return (
-    <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-700 select-none">
-      <div className="bg-white rounded-[2.5rem] border-2 border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[88vh] relative">
+    <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-700 select-none no-print">
+      <style jsx global>{`
+        @media print {
+          body { display: none !important; }
+        }
+        .no-select {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+      `}</style>
+      <div className="bg-white rounded-[2.5rem] border-2 border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[88vh] relative no-select">
         
         {/* Top Title Bar */}
         <div className="px-8 py-5 bg-[#FDFBF7] border-b border-[#C5A059]/10 flex items-center justify-between">
@@ -154,15 +177,23 @@ export default function PDFViewer() {
           {/* THE WATERMARK LAYER - REMOVED AS REQUESTED */}
           
           {/* The Document Viewer (Iframe) */}
-          <div className="w-full h-full relative z-10">
+          <div className="w-full h-full relative z-10 overscroll-none">
             <iframe 
               src={viewerUrl}
-              className={`w-full h-full border-none transition-all duration-700 min-h-[80vh] ${isBlurred ? 'blur-[90px] grayscale brightness-50 scale-110' : ''}`}
-              style={{ pointerEvents: 'none' }}
+              className={`w-full h-full border-none transition-all duration-700 min-h-[80vh] ${isBlurred ? 'blur-[100px] grayscale brightness-0 scale-110 opacity-0' : ''}`}
               title="Secure Viewer"
+              id="secure-iframe"
             />
-            {/* Click Protection Overlay */}
-            <div className="absolute inset-0 z-20"></div>
+            {/* 
+              Transparency Mask: 
+              We remove the pointer-events: none to allow scrolling, 
+              but we use an invisible overlay that only permits scrolling 
+              while blocking "long press" or "touch-hold" menus on mobile.
+            */}
+            <div 
+              className="absolute inset-0 z-20 bg-transparent touch-pan-y shadow-inner"
+              onContextMenu={(e) => e.preventDefault()}
+            ></div>
           </div>
 
           {/* Security Overlay (Blocks all interactions) */}
