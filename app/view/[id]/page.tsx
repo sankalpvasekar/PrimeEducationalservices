@@ -1,18 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-const SecurePDFViewer = dynamic(() => import('@/components/SecurePDFViewer'), { 
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center">
-      <p className="text-white/50 text-sm font-medium tracking-widest uppercase animate-pulse">
-        Initializing Secure Stream...
-      </p>
-    </div>
-  )
-});
 
 export default function Page() {
   const { id } = useParams();
@@ -36,11 +24,27 @@ export default function Page() {
 
   if (!url) return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center">
-      <p className="text-white/50 text-sm font-medium tracking-widest uppercase">
-        Verifying Access...
+      <p className="text-white/50 text-sm font-medium animate-pulse">
+        Loading Document...
       </p>
     </div>
   );
 
-  return <SecurePDFViewer url={url} />;
+  const isPpt = url.toLowerCase().includes('.ppt') || url.toLowerCase().includes('.pptx');
+
+  // Use Office Apps Viewer for robust PPT/PPTX rendering.
+  // Use native browser rendering for PDFs.
+  const viewerUrl = isPpt 
+    ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}` 
+    : url;
+
+  return (
+    <div className="w-full h-screen bg-white">
+      <iframe 
+        src={viewerUrl} 
+        className="w-full h-full border-none"
+        title="Document Viewer"
+      />
+    </div>
+  );
 }
