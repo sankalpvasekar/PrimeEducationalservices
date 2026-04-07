@@ -137,8 +137,8 @@ export default function PDFViewer() {
 
   if (!data) return null;
 
-  // Use Google Docs Viewer for robust PPT and PDF support
-  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(data.url)}&embedded=true`;
+  // Use direct Cloudinary URL with flags to hide UI
+  const viewerUrl = `${data.url}#toolbar=0&navpanes=0&scrollbar=0`;
 
   return (
     <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-700 select-none no-print">
@@ -153,6 +153,10 @@ export default function PDFViewer() {
           -moz-user-select: none;
           -ms-user-select: none;
           user-select: none;
+        }
+        /* Mobile specific scroll hardening */
+        #secure-iframe-container {
+          -webkit-overflow-scrolling: touch;
         }
       `}</style>
       <div className="bg-white rounded-[2.5rem] border-2 border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[88vh] relative no-select">
@@ -173,25 +177,22 @@ export default function PDFViewer() {
         </div>
 
         {/* PDF / PPT Container */}
-        <div className="flex-1 relative bg-gray-100 overflow-hidden">
-          {/* THE WATERMARK LAYER - REMOVED AS REQUESTED */}
+        <div id="secure-iframe-container" className="flex-1 relative bg-gray-100 overflow-hidden">
           
           {/* The Document Viewer (Iframe) */}
           <div className="w-full h-full relative z-10 overscroll-none">
             <iframe 
               src={viewerUrl}
-              className={`w-full h-full border-none transition-all duration-700 min-h-[80vh] ${isBlurred ? 'blur-[100px] grayscale brightness-0 scale-110 opacity-0' : ''}`}
+              className={`w-full h-full border-none transition-all duration-700 min-h-[80vh] ${isBlurred ? 'blur-[120px] grayscale brightness-0 scale-110 opacity-0' : ''}`}
               title="Secure Viewer"
               id="secure-iframe"
             />
             {/* 
               Transparency Mask: 
-              We remove the pointer-events: none to allow scrolling, 
-              but we use an invisible overlay that only permits scrolling 
-              while blocking "long press" or "touch-hold" menus on mobile.
+              Allows scrolling via touch-pan-y but blocks context menus.
             */}
             <div 
-              className="absolute inset-0 z-20 bg-transparent touch-pan-y shadow-inner"
+              className="absolute inset-0 z-20 bg-transparent touch-pan-y"
               onContextMenu={(e) => e.preventDefault()}
             ></div>
           </div>

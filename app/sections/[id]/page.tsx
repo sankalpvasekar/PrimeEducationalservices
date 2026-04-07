@@ -171,56 +171,25 @@ export default function SectionPage() {
         </div>
 
         {/* Action Area */}
-        {!isPurchased ? (
-          <div className="flex flex-col items-center gap-8">
-            <button 
-               disabled={processingPayment}
-               className="w-full py-4 md:py-5 bg-[#C5A059] text-white rounded-[2rem] font-bold text-xl md:text-2xl hover:bg-[#A68344] transition-all shadow-[0_15px_35px_-5px_rgba(197,160,89,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
-               onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
-            >
-               {processingPayment ? <Loader2 className="animate-spin" /> : null}
-               {isPurchased ? 'Go To PDF (Unlocked)' : 'Buy Now — ₹499'}
-            </button>
+        <div className="flex flex-col items-center gap-8">
+          <button 
+             disabled={processingPayment}
+             className="w-full py-4 md:py-5 bg-[#C5A059] text-white rounded-[2rem] font-bold text-xl md:text-2xl hover:bg-[#A68344] transition-all shadow-[0_15px_35px_-5px_rgba(197,160,89,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
+             onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
+          >
+             {processingPayment ? <Loader2 className="animate-spin" /> : null}
+             {isPurchased ? 'Go To PDF (Unlocked)' : 'Buy Now — ₹499'}
+          </button>
 
-            <div className="flex items-center gap-6 text-[#A1887F]/40">
-               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                  <ShieldCheck size={14} className="text-[#C5A059]/60" /> Secure
-               </div>
-               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                  <FileText size={14} className="text-[#C5A059]/60" /> Lifetime
-               </div>
-            </div>
+          <div className="flex items-center gap-6 text-[#A1887F]/40">
+             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                <ShieldCheck size={14} className="text-[#C5A059]/60" /> Secure
+             </div>
+             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                <FileText size={14} className="text-[#C5A059]/60" /> Lifetime
+             </div>
           </div>
-        ) : (
-          /* Purchased Content */
-          <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
-            <div className="flex items-center justify-between border-b border-[#C5A059]/10 pb-4">
-              <h3 className="text-xl font-bold text-[#3E2723] flex items-center gap-3">
-                 <FileText className="text-[#C5A059]" size={24} /> Materials
-              </h3>
-              <span className="text-[10px] font-black text-white bg-[#C5A059] px-3 py-1 rounded-full uppercase tracking-widest">{pdfs.length} Modules</span>
-            </div>
-
-            <div className="grid gap-4">
-              {pdfs.map((pdf) => (
-                <div 
-                  key={pdf.id} 
-                  className="bg-[#FDFBF7] rounded-3xl border border-[#C5A059]/10 p-6 flex items-center gap-5 hover:shadow-lg hover:border-[#C5A059]/30 cursor-pointer transition-all active:scale-[0.99] group"
-                  onClick={() => router.push(`/view/${pdf.id}`)}
-                >
-                  <div className="bg-white p-3.5 rounded-2xl shadow-sm">
-                     <FileText className="text-[#C5A059]" size={28} />
-                  </div>
-                  <div className="flex-1">
-                     <h4 className="font-bold text-[#3E2723] text-lg">{pdf.title}</h4>
-                     <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest mt-0.5">Ready to view</p>
-                  </div>
-                  <ChevronLeft size={20} className="rotate-180 text-[#C5A059]/40 group-hover:text-[#C5A059]" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </main>
     </div>
   );
