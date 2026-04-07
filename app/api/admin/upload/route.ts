@@ -11,6 +11,14 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
+    // PRE-FLIGHT CHECK: Cloudinary Credentials
+    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME) {
+      console.error('CRITICAL ERROR: Cloudinary API keys missing in environment Variables.');
+      return NextResponse.json({ 
+        error: 'Critical: Cloudinary Credentials Missing. Set CLOUDINARY_API_KEY on Vercel.' 
+      }, { status: 500 });
+    }
+
     const token = req.cookies.get('auth_token')?.value;
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -33,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const uploadResponse = await cloudinary.uploader.upload(base64File, {
       folder: 'prime-edu',
-      resource_type: type === 'pdf' ? 'auto' : 'image',
+      resource_type: type === 'pdf' ? 'raw' : 'image', // FORCE RAW for PDFs (solves CORB issues)
     });
 
     const fileUrl = uploadResponse.secure_url;

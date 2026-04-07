@@ -60,6 +60,7 @@ export default function AdminDashboard() {
   const [editingPdfId, setEditingPdfId] = useState<number | null>(null);
   const [editPdfTitle, setEditPdfTitle] = useState('');
   const [editPdfPrice, setEditPdfPrice] = useState('');
+  const [pendingPdf, setPendingPdf] = useState<File | null>(null);
 
   const handleFatalAuth = useCallback(() => {
     localStorage.removeItem('auth_token');
@@ -171,14 +172,14 @@ export default function AdminDashboard() {
     }
   };
 
-  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0] || !selectedCat || !pdfTitle) {
-      toast.error('Please provide title and file');
+  const handlePdfUpload = async () => {
+    if (!pendingPdf || !selectedCat || !pdfTitle) {
+      toast.error('Missing title or file');
       return;
     }
     setUploading(true);
     const fd = new FormData();
-    fd.append('file', e.target.files[0]);
+    fd.append('file', pendingPdf);
     fd.append('type', 'pdf');
     fd.append('sectionId', selectedCat.toString());
     fd.append('title', pdfTitle);
@@ -187,14 +188,18 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
       if (res.ok) {
-        toast.success('PDF Added');
+        toast.success('Material Added Successfully');
         setPdfTitle('');
+        setPendingPdf(null);
         const resP = await fetch(`/api/admin/pdfs?sectionId=${selectedCat}`);
         const d = await resP.json();
         setPdfs(d.pdfs || []);
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.error || 'Upload failed');
       }
     } catch (err) {
-      toast.error('Upload failed');
+      toast.error('Network error during upload');
     } finally {
       setUploading(false);
     }
@@ -475,23 +480,49 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       ))}
-                      
-                      <div className="p-4 bg-white border-2 border-dashed border-[#C5A059]/20 rounded-[1.5rem] space-y-3 flex flex-col justify-center">
-                         <input 
-                           type="text" placeholder="Material Title" 
-                           className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-3 py-2 text-xs focus:outline-none"
-                           value={pdfTitle} onChange={e => setPdfTitle(e.target.value)}
-                         />
-                         <div className="flex flex-col sm:flex-row gap-2">
-                            <input 
-                              type="number" className="w-full sm:w-20 bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-3 py-2 text-xs focus:outline-none"
-                              value={pdfPrice} onChange={e => setPdfPrice(e.target.value)}
-                              placeholder="Price"
-                            />
-                            <label className="flex-1 py-2 bg-[#5D4037] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md">
-                              {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />} {uploading ? 'Syncing...' : 'Add PDF'}
-                              <input type="file" className="hidden" accept=".pdf" onChange={handlePdfUpload} disabled={uploading} />
-                            </label>
+                                           <div className="p-4 bg-white border-2 border-dashed border-[#C5A059]/30 rounded-[1.5rem] space-y-4 flex flex-col justify-center">
+                         <div className="space-y-1">
+                           <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest pl-1">Document Title</label>
+                           <input 
+                             type="text" placeholder="e.g. History Notes Part 1" 
+                             className="w-full bg-[#FDFBF7] border border-[#C5A059]/20 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A059]/50"
+                             value={pdfTitle} onChange={e => setPdfTitle(e.target.value)}
+                           />
+                         </div>
+
+                         <div className="flex flex-col gap-3">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1">
+                                <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest pl-1">Price (₹)</label>
+                                <input 
+                                  type="number" className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
+                                  value={pdfPrice} onChange={e => setPdfPrice(e.target.value)}
+                                />
+                              </div>
+                              <div className="flex-1 mt-4">
+                                <label className={`w-full py-2.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all border-2 border-dashed ${pendingPdf ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-[#C5A059]/20 text-[#A1887F] hover:bg-[#FDFBF7]'}`}>
+                                  {pendingPdf ? <CheckCircle2 size={14} /> : <FileText size={14} />} 
+                                  <span className="text-[11px] font-bold truncate max-w-[100px]">
+                                    {pendingPdf ? pendingPdf.name : 'Select File'}
+                                  </span>
+                                  <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept=".pdf,.ppt,.pptx" 
+                                    onChange={(e) => setPendingPdf(e.target.files?.[0] || null)} 
+                                  />
+                                </label>
+                              </div>
+                            </div>
+
+                            <button 
+                              onClick={handlePdfUpload}
+                              disabled={uploading || !pendingPdf || !pdfTitle}
+                              className={`w-full py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md ${uploading || !pendingPdf || !pdfTitle ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' : 'bg-[#5D4037] text-white hover:bg-[#3E2723] active:scale-95'}`}
+                            >
+                              {uploading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />} 
+                              {uploading ? 'Processing sync...' : pendingPdf ? 'Click to Confirm Sync' : 'Complete All Fields'}
+                            </button>
                          </div>
                       </div>
                     </div>
