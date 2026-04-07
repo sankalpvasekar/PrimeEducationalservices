@@ -33,32 +33,35 @@ export default function PDFViewer() {
 
   // SECURITY: Focus/Blur Protection (Android & Desktop)
   useEffect(() => {
-    const handleBlur = () => {
-       setIsBlurred(true);
-       toast.error('Content hidden for security.', { id: 'blur-toast' });
+    const handleBlackout = () => setIsBlurred(true);
+    const handleRestore = () => {
+       // Minimal delay before unblurring to prevent frame-perfect screenshots
+       setTimeout(() => setIsBlurred(false), 500);
     };
-    const handleFocus = () => setIsBlurred(false);
 
-    // visibilitychange covers task switching / screenshot attempts on many mobile OSs
+    // visibilitychange covers tab switching / task view / app-switching
     const handleVisibilityChange = () => {
-       if (document.visibilityState === 'hidden') {
-          handleBlur();
-       } else {
-          // Add a slight delay before unblurring to deter rapid screenshotting
-          setTimeout(handleFocus, 500);
+       if (document.visibilityState === 'hidden') handleBlackout();
+       else handleRestore();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handleBlackout); // Critical for mobile
+    
+    // Prohibit Screenshot/Print-Screen detection logic
+    const handleKeyDown = (e: KeyboardEvent) => {
+       if (e.key === 'PrintScreen' || (e.ctrlKey && (e.key === 'p' || e.key === 's'))) {
+          e.preventDefault();
+          handleBlackout();
+          toast.error('Screenshot / Printing is prohibited.');
        }
     };
-
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pagehide', handleBlur); // Critical for mobile
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pagehide', handleBlur);
+      window.removeEventListener('pagehide', handleBlackout);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -67,18 +70,11 @@ export default function PDFViewer() {
     const disableActions = (e: MouseEvent | KeyboardEvent) => {
       if (e instanceof MouseEvent && e.type === 'contextmenu') {
         e.preventDefault();
-        toast.error('Right-click is restricted.', { id: 'ctx-toast' });
       }
 
       if (e instanceof KeyboardEvent) {
-        const forbidden = (
-          (e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 's' || e.key === 'p') ||
-          e.key === 'PrintScreen' || e.key === 'F12'
-        );
-        if (forbidden) {
-          e.preventDefault();
-          toast.error('This action is restricted.', { id: 'key-toast' });
-        }
+        const forbidden = (e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 's' || e.key === 'p');
+        if (forbidden) e.preventDefault();
       }
     };
 
@@ -89,41 +85,6 @@ export default function PDFViewer() {
       window.removeEventListener('contextmenu', disableActions as any);
       window.removeEventListener('keydown', disableActions as any);
     };
-  }, []);
-
-  // Proactive Screen Record/Capture Protection
-  useEffect(() => {
-    const handleMouseLeave = () => {
-       setIsBlurred(true);
-       toast.error('Content hidden: Mouse exited secure zone.', { id: 'ctx-toast' });
-    };
-    const handleBeforePrint = () => {
-       setIsBlurred(true);
-       toast.error('Printing is prohibited.', { id: 'print-toast' });
-    };
-
-    window.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('beforeprint', handleBeforePrint);
-    
-    return () => {
-      window.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('beforeprint', handleBeforePrint);
-    };
-  }, []);
-
-  // Detect Screen Recording (Window Resize/Inspect)
-  useEffect(() => {
-    const handleResize = () => {
-       // Detecting if DevTools opened or window size changed significantly (often happens when starting recording software)
-       if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-          setIsBlurred(true);
-          toast.error('Security alert: Screen capture or inspection detected.', { id: 'detect-toast' });
-       }
-    };
-    window.addEventListener('resize', handleResize);
-    // Initial check
-    setTimeout(handleResize, 1000);
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   if (loading) {
@@ -141,7 +102,7 @@ export default function PDFViewer() {
   const viewerUrl = `${data.url}#toolbar=0&navpanes=0&scrollbar=0`;
 
   return (
-    <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-700 select-none no-print">
+    <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-4 animate-in fade-in duration-700 select-none no-print">
       <style jsx global>{`
         @media print {
           body { display: none !important; }
@@ -154,36 +115,30 @@ export default function PDFViewer() {
           -ms-user-select: none;
           user-select: none;
         }
-        /* Mobile specific scroll hardening */
         #secure-iframe-container {
           -webkit-overflow-scrolling: touch;
         }
       `}</style>
-      <div className="bg-white rounded-[2.5rem] border-2 border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[88vh] relative no-select">
-        
-        {/* Top Title Bar */}
-        <div className="px-8 py-5 bg-[#FDFBF7] border-b border-[#C5A059]/10 flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <Link href={`/curriculum/${id}`} className="p-2.5 bg-white border border-gray-100 shadow-sm hover:bg-[#C5A059]/10 rounded-full transition-colors text-[#A1887F]">
-              <ChevronLeft size={22} />
-            </Link>
-            <div>
-              <h1 className="font-bold text-[#3E2723] text-lg md:text-xl">{data.title}</h1>
-              <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 mt-1">
-                <ShieldCheck size={14} className="text-[#C5A059]" /> Secured Environment • {data.user.email}
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* PDF / PPT Container */}
-        <div id="secure-iframe-container" className="flex-1 relative bg-gray-100 overflow-hidden">
+      {/* Minimal Floating Back Button */}
+      <div className="fixed top-6 left-6 z-[200]">
+        <button 
+          onClick={() => router.back()}
+          className="p-3.5 bg-white/90 border border-[#C5A059]/30 shadow-xl hover:bg-[#C5A059] hover:text-white rounded-full transition-all text-[#C5A059] active:scale-90"
+        >
+          <ChevronLeft size={24} />
+        </button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[92vh] relative no-select">
+        {/* PDF / PPT Container - Purely Normal Presentation */}
+        <div id="secure-iframe-container" className="flex-1 relative bg-white overflow-hidden">
           
           {/* The Document Viewer (Iframe) */}
           <div className="w-full h-full relative z-10 overscroll-none">
             <iframe 
               src={viewerUrl}
-              className={`w-full h-full border-none transition-all duration-700 min-h-[80vh] ${isBlurred ? 'blur-[120px] grayscale brightness-0 scale-110 opacity-0' : ''}`}
+              className={`w-full h-full border-none transition-all duration-700 min-h-[90vh] ${isBlurred ? 'blur-[120px] grayscale brightness-0 scale-110 opacity-0 pointer-events-none' : ''}`}
               title="Secure Viewer"
               id="secure-iframe"
             />
@@ -197,30 +152,16 @@ export default function PDFViewer() {
             ></div>
           </div>
 
-          {/* Security Overlay (Blocks all interactions) */}
+          {/* Security Overlay (Blocks all interactions during blackout) */}
           {isBlurred && (
-            <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-white/95 backdrop-blur-3xl animate-in fade-in duration-500">
-               <div className="bg-red-50 p-6 rounded-full mb-6">
-                  <AlertTriangle className="text-red-500" size={64} />
+            <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black animate-in fade-in duration-300">
+               <div className="text-center px-10">
+                  <ShieldCheck className="text-[#C5A059] mx-auto mb-6" size={64} />
+                  <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Security Hardened Screen</h2>
+                  <p className="text-white/40 text-sm font-medium">Content hidden to protect from unauthorized capture.</p>
                </div>
-               <h2 className="text-2xl font-bold text-[#3E2723]">Security Interruption Detected</h2>
-               <p className="text-base text-[#A1887F] mt-3 font-medium max-w-sm text-center">
-                 Content has been protected. Please switch back to this tab and ensure no recording tools are active.
-               </p>
-               <button 
-                 onClick={() => setIsBlurred(false)}
-                 className="mt-8 px-8 py-3 bg-[#C5A059] text-white rounded-full font-bold shadow-lg hover:bg-[#A68344] transition-all"
-               >
-                 Resume Viewing
-               </button>
             </div>
           )}
-        </div>
-
-        {/* Status Bar */}
-        <div className="px-8 py-4 bg-[#3E2723] text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] flex items-center justify-between">
-           <span className="flex items-center gap-2"><ShieldCheck size={14} /> Encrypted Session</span>
-           <span>DO NOT SHARE • SCREEN RECORDING PROHIBITED</span>
         </div>
       </div>
     </div>

@@ -65,21 +65,11 @@ export default function CurriculumPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-4xl mx-auto px-6 py-12">
-        {/* Navigation */}
-        <div className="flex items-center justify-between mb-12 border-b border-gray-100 pb-8">
-          <div className="flex flex-col gap-1">
-             <Link href="/" className="inline-flex items-center gap-1 text-[#A1887F] hover:text-[#C5A059] text-xs font-bold uppercase tracking-widest transition-colors mb-2">
-                <ChevronLeft size={14} /> Back to Library
-             </Link>
-             <h1 className="text-3xl font-bold text-[#3E2723]">{section.title}</h1>
-             <p className="text-sm text-[#A1887F] font-medium">Your Unlocked Materials</p>
-          </div>
-          <div className="hidden md:flex flex-col items-end">
-             <div className="bg-[#C5A059]/10 text-[#C5A059] px-4 py-2 rounded-2xl flex items-center gap-2">
-                <ShoppingBag size={18} />
-                <span className="text-sm font-bold uppercase tracking-widest">Unlocked</span>
-             </div>
-          </div>
+        {/* Navigation - Minimalist Back Button only */}
+        <div className="mb-8 border-b border-gray-100 pb-4">
+           <Link href="/" className="inline-flex items-center gap-1 text-[#A1887F] hover:text-[#C5A059] text-sm font-bold uppercase tracking-widest transition-colors">
+              <ChevronLeft size={16} /> Back to Library
+           </Link>
         </div>
 
         {/* Content Modules - Redesigned to match Landing Page style */}
