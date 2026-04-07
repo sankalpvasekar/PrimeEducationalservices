@@ -29,7 +29,7 @@ export default function SecurePDF({ url }: { url: string }) {
 
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          canvas.className = "mb-2 shadow-2xl max-w-full h-auto";
+          canvas.className = "mb-2 bg-white shadow-2xl max-w-full h-auto";
 
           container.appendChild(canvas);
 

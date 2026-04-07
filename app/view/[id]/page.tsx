@@ -25,15 +25,7 @@ export default function Page() {
         const result = await res.json();
         
         if (result.url) {
-            // Transform URL to raw format if needed (fixes attachment/preview issues and CORB)
-            let fixedUrl = result.url;
-            if (fixedUrl.includes('image/upload')) {
-                fixedUrl = fixedUrl.replace('image/upload', 'raw/upload');
-            }
-            if (!fixedUrl.includes('fl_attachment:false')) {
-                fixedUrl = fixedUrl.replace('upload/', 'upload/fl_attachment:false/');
-            }
-            setUrl(fixedUrl);
+            setUrl(result.url);      
         }
       } catch (err) {
         console.error(err);
