@@ -98,8 +98,8 @@ export default function PDFViewer() {
 
   if (!data) return null;
 
-  // Use direct Cloudinary URL with flags to hide UI
-  const viewerUrl = `${data.url}#toolbar=0&navpanes=0&scrollbar=0`;
+  // RESTORE: Google Docs Viewer for maximum stability across devices
+  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(data.url)}&embedded=true`;
 
   return (
     <div className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-4 animate-in fade-in duration-700 select-none no-print">
@@ -131,14 +131,14 @@ export default function PDFViewer() {
       </div>
 
       <div className="bg-white rounded-3xl border border-[#C5A059]/10 shadow-2xl overflow-hidden flex flex-col min-h-[92vh] relative no-select">
-        {/* PDF / PPT Container - Purely Normal Presentation */}
+        {/* PDF / PPT Container - Restored Google Docs Viewer for Stability */}
         <div id="secure-iframe-container" className="flex-1 relative bg-white overflow-hidden">
           
           {/* The Document Viewer (Iframe) */}
           <div className="w-full h-full relative z-10 overscroll-none">
             <iframe 
               src={viewerUrl}
-              className={`w-full h-full border-none transition-all duration-700 min-h-[90vh] ${isBlurred ? 'blur-[120px] grayscale brightness-0 scale-110 opacity-0 pointer-events-none' : ''}`}
+              className={`w-full h-full border-none transition-all duration-700 min-h-[92vh] ${isBlurred ? 'blur-[120px] grayscale brightness-0 scale-110 opacity-0 pointer-events-none' : ''}`}
               title="Secure Viewer"
               id="secure-iframe"
             />

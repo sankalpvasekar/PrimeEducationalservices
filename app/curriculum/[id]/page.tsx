@@ -96,12 +96,6 @@ export default function CurriculumPage() {
           </div>
         </div>
 
-        {/* Security Notice */}
-        <div className="mt-16 text-center">
-           <p className="text-[9px] text-[#A1887F] uppercase tracking-[0.3em] inline-flex items-center gap-2 bg-[#FDFBF7] px-6 py-2 rounded-full border border-gray-100">
-              <ShieldCheck size={12} className="text-[#C5A059]" /> All Materials are watermarked and protected by Prime Educational Services
-           </p>
-        </div>
       </main>
     </div>
   );
