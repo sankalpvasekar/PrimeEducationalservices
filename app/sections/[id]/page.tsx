@@ -128,7 +128,7 @@ export default function SectionPage() {
     if (!data?.section) return;
     const shareData = {
       title: data.section.title,
-      text: data.section.subtitle || 'Check out this educational material!',
+      text: `Get full access to ${data.section.title} on Prime Educational Services`,
       url: window.location.href,
     };
 
