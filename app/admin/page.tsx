@@ -154,19 +154,47 @@ export default function AdminDashboard() {
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0] || !selectedCat) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append('file', e.target.files[0]);
-    fd.append('type', 'banner');
-    fd.append('sectionId', selectedCat.toString());
 
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      // 1. Get Signature
+      const sigRes = await fetch('/api/admin/upload-signature');
+      const sigData = await sigRes.json();
+      if (!sigRes.ok) throw new Error(sigData.error || 'Failed to get upload signature');
+
+      // 2. Upload to Cloudinary
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('api_key', sigData.api_key);
+      formData.append('timestamp', sigData.timestamp);
+      formData.append('signature', sigData.signature);
+      formData.append('folder', 'prime-edu');
+
+      const cldRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloud_name}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const cldData = await cldRes.json();
+      if (!cldRes.ok) throw new Error(cldData.error?.message || 'Cloudinary upload failed');
+
+      // 3. Save to DB
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sectionId: selectedCat,
+          type: 'banner',
+          fileUrl: cldData.secure_url
+        })
+      });
+
       if (res.ok) {
         toast.success('Banner updated');
         fetchData();
       }
-    } catch (err) {
-      toast.error('Upload failed');
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+      console.error(err);
     } finally {
       setUploading(false);
     }
@@ -178,15 +206,41 @@ export default function AdminDashboard() {
       return;
     }
     setUploading(true);
-    const fd = new FormData();
-    fd.append('file', pendingPdf);
-    fd.append('type', 'pdf');
-    fd.append('sectionId', selectedCat.toString());
-    fd.append('title', pdfTitle);
-    fd.append('price', pdfPrice);
 
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      // 1. Get Signature
+      const sigRes = await fetch('/api/admin/upload-signature');
+      const sigData = await sigRes.json();
+      if (!sigRes.ok) throw new Error(sigData.error || 'Failed to get upload signature');
+
+      // 2. Upload to Cloudinary (resource_type: raw for PDF/PPT)
+      const formData = new FormData();
+      formData.append('file', pendingPdf);
+      formData.append('api_key', sigData.api_key);
+      formData.append('timestamp', sigData.timestamp);
+      formData.append('signature', sigData.signature);
+      formData.append('folder', 'prime-edu');
+
+      const cldRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloud_name}/raw/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const cldData = await cldRes.json();
+      if (!cldRes.ok) throw new Error(cldData.error?.message || 'Cloudinary upload failed');
+
+      // 3. Save to DB
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sectionId: selectedCat,
+          type: 'pdf',
+          title: pdfTitle,
+          price: pdfPrice,
+          fileUrl: cldData.secure_url
+        })
+      });
+
       if (res.ok) {
         toast.success('Material Added Successfully');
         setPdfTitle('');
@@ -198,8 +252,9 @@ export default function AdminDashboard() {
         const errorData = await res.json();
         toast.error(errorData.error || 'Upload failed');
       }
-    } catch (err) {
-      toast.error('Network error during upload');
+    } catch (err: any) {
+      toast.error(err.message || 'Network error during upload');
+      console.error(err);
     } finally {
       setUploading(false);
     }

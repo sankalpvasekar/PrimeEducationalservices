@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     const orders = await query(`
       SELECT 
         o.id, 
-        u.name as user_name, 
-        u.email as user_email, 
+        o.payment_id as order_id, 
+        u.name as customer_name, 
+        u.email as customer_email, 
         c.title as section_title, 
         o.amount, 
         o.status, 

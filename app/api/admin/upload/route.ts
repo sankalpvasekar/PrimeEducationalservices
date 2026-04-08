@@ -11,40 +11,18 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
-    // PRE-FLIGHT CHECK: Cloudinary Credentials
-    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME) {
-      console.error('CRITICAL ERROR: Cloudinary API keys missing in environment Variables.');
-      return NextResponse.json({ 
-        error: 'Critical: Cloudinary Credentials Missing. Set CLOUDINARY_API_KEY on Vercel.' 
-      }, { status: 500 });
-    }
-
     const token = req.cookies.get('auth_token')?.value;
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const payload = verifyToken(token);
     if (!payload || !payload.isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const formData = await req.formData();
-    const sectionId = formData.get('sectionId') as string;
-    const type = formData.get('type') as string; // 'banner' or 'pdf'
-    const title = formData.get('title') as string;
-    const price = formData.get('price') as string;
-    const file = formData.get('file') as File;
+    const body = await req.json();
+    const { sectionId, type, title, price, fileUrl } = body;
 
-    if (!file || !sectionId) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+    if (!fileUrl || !sectionId) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
 
-    const buffer = await file.arrayBuffer();
-    const base64File = `data:${file.type};base64,${Buffer.from(buffer).toString('base64')}`;
-
-    console.log(`Uploading ${type} for section ${sectionId}...`);
-
-    const uploadResponse = await cloudinary.uploader.upload(base64File, {
-      folder: 'prime-edu',
-      resource_type: type === 'pdf' ? 'raw' : 'image', // FORCE RAW for PDFs (solves CORB issues)
-    });
-
-    const fileUrl = uploadResponse.secure_url;
+    console.log(`Saving ${type} info for section ${sectionId}...`);
 
     if (type === 'banner') {
       await query('UPDATE exam_categories SET banner_url = $1 WHERE id = $2', [fileUrl, sectionId]);
@@ -52,7 +30,7 @@ export async function POST(req: NextRequest) {
     } else if (type === 'pdf') {
       await query(
         'INSERT INTO pdfs (section_id, title, price, cloudinary_url) VALUES ($1, $2, $3, $4)',
-        [sectionId, title || file.name, price || 0, fileUrl]
+        [sectionId, title || 'Untitled', price || 0, fileUrl]
       );
       return NextResponse.json({ success: true, url: fileUrl, message: 'PDF uploaded!' });
     }
@@ -60,6 +38,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (err) {
     console.error('Upload Error:', err);
-    return NextResponse.json({ error: 'Server error during upload' }, { status: 500 });
+    return NextResponse.json({ error: 'Server error during upload store' }, { status: 500 });
   }
 }
