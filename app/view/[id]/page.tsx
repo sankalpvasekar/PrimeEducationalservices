@@ -23,8 +23,24 @@ export default function Page() {
   }, [id]);
 
   useEffect(() => {
+    // Aggressive global selection block for the entire document
+    const style = document.createElement('style');
+    style.innerHTML = `
+      * {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-touch-callout: none !important;
+      }
+      iframe {
+        pointer-events: auto !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     const preventShortcuts = (e: KeyboardEvent) => {
-      // Block Ctrl+C, Ctrl+P, Ctrl+S, Ctrl+X, Ctrl+U, F12, Ctrl+Shift+I
+      // Block Ctrl+C, Ctrl+P, Ctrl+S, Ctrl+X, Ctrl+U, F12, Ctrl+Shift+I/J
       if (
         ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'p' || e.key === 's' || e.key === 'x' || e.key === 'u' || e.key === 'i' || e.key === 'j')) ||
         (e.key === 'F12') ||
@@ -35,7 +51,12 @@ export default function Page() {
       }
     };
     window.addEventListener('keydown', preventShortcuts);
-    return () => window.removeEventListener('keydown', preventShortcuts);
+    return () => {
+      window.removeEventListener('keydown', preventShortcuts);
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
   }, []);
 
   if (!url) return (
@@ -50,7 +71,7 @@ export default function Page() {
 
   // Use Office Apps Viewer for robust PPT/PPTX rendering.
   // Use native browser rendering for PDFs with hidden toolbars to block download UI.
-  const pdfViewerUrl = `${url}#toolbar=0&navpanes=0&scrollbar=1`; // Keep scrollbar for usability
+  const pdfViewerUrl = `${url}#toolbar=0&navpanes=0&scrollbar=1`; 
   const viewerUrl = isPpt 
     ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}` 
     : pdfViewerUrl;
@@ -71,8 +92,11 @@ export default function Page() {
         userSelect: 'none',
       }}
     >
-      {/* Invisible overlay to deter some direct clicks/selection while keeping scroll functionality if possible */}
-      <div className="absolute inset-0 z-10 bg-transparent pointer-events-none" />
+      {/* Invisible overlay layer to deter selection actions */}
+      <div 
+        className="absolute inset-0 z-10 bg-transparent pointer-events-none" 
+        onContextMenu={(e) => e.preventDefault()}
+      />
       
       <iframe 
         src={viewerUrl} 
