@@ -12,6 +12,7 @@ interface Category {
   subtitle: string;
   banner_url?: string;
   description?: string;
+  price: number;
 }
 
 interface Pdf {
@@ -57,6 +58,7 @@ export default function AdminDashboard() {
   const [pdfPrice, setPdfPrice] = useState('499');
   const [editTitle, setEditTitle] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
+  const [editPrice, setEditPrice] = useState('499');
   const [editingPdfId, setEditingPdfId] = useState<number | null>(null);
   const [editPdfTitle, setEditPdfTitle] = useState('');
   const [editPdfPrice, setEditPdfPrice] = useState('');
@@ -108,6 +110,7 @@ export default function AdminDashboard() {
       if (cat) {
          setEditTitle(cat.title);
          setEditSubtitle(cat.subtitle || '');
+         setEditPrice(cat.price?.toString() || '499');
       }
       fetch(`/api/admin/pdfs?sectionId=${selectedCat}`)
         .then(res => res.json())
@@ -140,7 +143,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/sections', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sectionId: selectedCat, title: editTitle, subtitle: editSubtitle })
+        body: JSON.stringify({ sectionId: selectedCat, title: editTitle, subtitle: editSubtitle, price: parseFloat(editPrice) })
       });
       if (res.ok) {
         toast.success('Section metadata updated');
@@ -434,6 +437,16 @@ export default function AdminDashboard() {
                           onChange={e => setEditSubtitle(e.target.value)}
                           onBlur={handleUpdateSection}
                           placeholder="Curriculum Tagline"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest pl-1">Section Price (₹)</label>
+                        <input 
+                          type="number" className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-2xl px-5 py-3.5 text-sm text-[#5D4037] font-bold focus:border-[#C5A059]/40 focus:ring-4 focus:ring-[#C5A059]/5 transition-all outline-none" 
+                          value={editPrice} 
+                          onChange={e => setEditPrice(e.target.value)}
+                          onBlur={handleUpdateSection}
+                          placeholder="0.00"
                         />
                       </div>
                     </div>

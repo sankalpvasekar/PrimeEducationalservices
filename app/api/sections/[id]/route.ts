@@ -16,6 +16,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       subtitle: string;
       description: string;
       banner_url: string;
+      price: number;
     }>('SELECT * FROM exam_categories WHERE id = $1', [sectionId]);
 
     if (sections.length === 0) return NextResponse.json({ error: 'Section not found' }, { status: 404 });

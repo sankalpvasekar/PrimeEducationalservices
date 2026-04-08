@@ -1,0 +1,45 @@
+[
+  [
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "is_premium"
+    },
+    {
+      "column_name": "created_at"
+    },
+    {
+      "column_name": "banner_url"
+    },
+    {
+      "column_name": "description"
+    },
+    {
+      "column_name": "title"
+    },
+    {
+      "column_name": "subtitle"
+    }
+  ],
+  [
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "section_id"
+    },
+    {
+      "column_name": "price"
+    },
+    {
+      "column_name": "created_at"
+    },
+    {
+      "column_name": "title"
+    },
+    {
+      "column_name": "cloudinary_url"
+    }
+  ]
+]

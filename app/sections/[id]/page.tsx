@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { Lock, FileText, ShoppingCart, Loader2, ChevronLeft, ShieldCheck } from 'lucide-react';
+import { Lock, FileText, ShoppingCart, Loader2, ChevronLeft, ShieldCheck, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -13,6 +13,7 @@ interface Section {
   subtitle: string;
   description: string;
   banner_url: string;
+  price: number;
 }
 
 interface PDF {
@@ -123,6 +124,31 @@ export default function SectionPage() {
     }
   };
 
+  const handleShare = async () => {
+    if (!data?.section) return;
+    const shareData = {
+      title: data.section.title,
+      text: data.section.subtitle || 'Check out this educational material!',
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast.success('Shared successfully!');
+      } catch (err) {
+        console.log('Share canceled or failed', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!');
+      } catch (err) {
+        toast.error('Failed to copy link');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFBF7]">
@@ -137,15 +163,24 @@ export default function SectionPage() {
   const { section, pdfs, isPurchased } = data;
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-white pb-20 select-none">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       
-      <main className="max-w-xl mx-auto px-6 pt-10">
-        {/* Back Button */}
-        <Link href="/" className="inline-flex items-center gap-2 text-[#A1887F] hover:text-[#C5A059] mb-8 transition-colors">
-          <ChevronLeft size={20} />
-          <span className="text-sm font-bold uppercase tracking-widest">Back</span>
-        </Link>
+      <main className="max-w-xl mx-auto px-6 pt-10 relative">
+        {/* Back Button & Share */}
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-[#A1887F] hover:text-[#C5A059] transition-colors">
+            <ChevronLeft size={20} />
+            <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+          </Link>
+
+          <button 
+            onClick={handleShare}
+            className="p-3 bg-white border border-[#C5A059]/10 rounded-2xl shadow-sm text-[#C5A059] hover:bg-[#FDFBF7] transition-all"
+          >
+            <Share2 size={20} />
+          </button>
+        </div>
 
         {/* Section Title */}
         <div className="text-center mb-8">
@@ -178,7 +213,7 @@ export default function SectionPage() {
              onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
           >
              {processingPayment ? <Loader2 className="animate-spin" /> : null}
-             {isPurchased ? 'Go To PDF (Unlocked)' : 'Buy Now — ₹499'}
+             {isPurchased ? 'Go To PDF (Unlocked)' : `Buy Now — ₹${section.price || 499}`}
           </button>
 
           <div className="flex items-center gap-6 text-[#A1887F]/40">
