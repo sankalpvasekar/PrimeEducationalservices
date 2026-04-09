@@ -22,9 +22,7 @@ export default function ContactPage() {
               <h3 className="text-xl font-bold text-[#3E2723] mb-6 underline decoration-[#C5A059] underline-offset-8">Quick Support Channels</h3>
               <div className="space-y-6">
                  {[
-                   { icon: <MessageSquare />, label: 'Chat on WhatsApp', action: 'Chat Now', value: '+91 9765269550', link: 'https://wa.me/919765269550' },
-                   { icon: <Phone />, label: 'Call Support', action: 'Call Now', value: '9765269550', link: 'tel:+919765269550' },
-                   { icon: <Mail />, label: 'Support Email', action: 'Send Mail', value: 'nehabookindustries@gmail.com', link: 'mailto:nehabookindustries@gmail.com' },
+                   { icon: <Mail />, label: 'Support Email', action: 'Send Mail', value: 'primeeducationalservices515@gmail.com', link: 'mailto:primeeducationalservices515@gmail.com' },
                    { icon: <MapPin />, label: 'Visit Us', action: 'View Map', value: 'Pandharpur, Maharashtra', link: '#' }
                  ].map((item, i) => (
                     <div key={i} className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#C5A059]/5 shadow-sm hover:border-[#C5A059]/30 transition-all">

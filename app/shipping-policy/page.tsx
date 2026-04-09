@@ -54,7 +54,7 @@ export default function ShippingPolicyPage() {
           <section className="bg-[#3E2723] text-white rounded-3xl p-8 relative overflow-hidden">
              <div className="relative z-10">
                <h3 className="text-xl font-bold mb-3">Delivery Issues?</h3>
-               <p className="text-white/70 text-sm">If you experience any delay beyond the estimated timeline or receive a damaged package, please contact us within **24 hours** at <span className="text-[#C5A059] font-bold">9765269550</span>.</p>
+               <p className="text-white/70 text-sm">If you experience any delay beyond the estimated timeline or receive a damaged package, please contact us within **24 hours** at <span className="text-[#C5A059] font-bold">primeeducationalservices515@gmail.com</span>.</p>
              </div>
              <div className="absolute top-0 right-0 p-8 opacity-10">
                 <Truck size={100} />

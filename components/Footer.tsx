@@ -46,17 +46,10 @@ export default function Footer() {
         <div className="space-y-4">
           <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs mb-6">Contact Us</h4>
           <div className="flex items-start gap-3">
-             <Phone className="text-[#C5A059] shrink-0" size={18} />
-             <div className="flex flex-col">
-               <span className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest">Call or WhatsApp</span>
-               <Link href="tel:+919765269550" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059] transition-colors">+91 9765269550</Link>
-             </div>
-          </div>
-          <div className="flex items-start gap-3">
              <Mail className="text-[#C5A059] shrink-0" size={18} />
              <div className="flex flex-col">
                <span className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest">Email Address</span>
-               <Link href="mailto:nehabookindustries@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059] transition-colors">nehabookindustries@gmail.com</Link>
+               <Link href="mailto:primeeducationalservices515@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059] transition-colors">primeeducationalservices515@gmail.com</Link>
              </div>
           </div>
           <div className="flex items-start gap-3">
@@ -71,7 +64,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-[#C5A059]/10 text-center">
-         <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-[0.3em]">&copy; 2026 Prime Educational Services. All Rights Reserved.</p>
+         <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-[0.3em]">&copy; 2026 Prime Educational Services.</p>
       </div>
     </footer>
   );

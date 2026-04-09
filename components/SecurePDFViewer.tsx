@@ -29,7 +29,7 @@ export default function SecurePDF({ url }: { url: string }) {
 
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          canvas.className = "mb-2 bg-white shadow-2xl max-w-full h-auto";
+          canvas.className = "mb-2 bg-white shadow-2xl max-w-full h-auto pointer-events-none";
 
           container.appendChild(canvas);
 
@@ -63,20 +63,33 @@ export default function SecurePDF({ url }: { url: string }) {
     const handleKey = (e: KeyboardEvent) => {
       if (
         e.key === "PrintScreen" ||
-        (e.ctrlKey && ["p", "s", "c", "u"].includes(e.key.toLowerCase())) ||
-        (e.ctrlKey && e.shiftKey && e.key === "I")
+        e.key === "F12" ||
+        (e.ctrlKey && ["p", "s", "c", "u", "a", "x"].includes(e.key.toLowerCase())) ||
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C", "K"].includes(e.key.toUpperCase())) ||
+        (e.metaKey && ["p", "s", "c", "u", "a", "x"].includes(e.key.toLowerCase())) // Mac support
       ) {
         e.preventDefault();
+        return false;
       }
     };
 
+    const preventDefault = (e: any) => e.preventDefault();
+
     document.addEventListener("visibilitychange", handleVisibility);
     document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("copy", preventDefault);
+    document.addEventListener("cut", preventDefault);
+    document.addEventListener("paste", preventDefault);
+    document.addEventListener("dragstart", preventDefault);
     window.addEventListener("keydown", handleKey);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
       document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("copy", preventDefault);
+      document.removeEventListener("cut", preventDefault);
+      document.removeEventListener("paste", preventDefault);
+      document.removeEventListener("dragstart", preventDefault);
       window.removeEventListener("keydown", handleKey);
       document.body.style.filter = "none";
     };
