@@ -166,30 +166,26 @@ export default function SectionPage() {
     <div className="min-h-screen bg-white pb-20 select-none">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       
-      <main className="max-w-xl mx-auto px-6 pt-10 relative">
+      <main className="max-w-xl mx-auto px-6 pt-0 relative">
         {/* Back Button & Share */}
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-[#A1887F] hover:text-[#C5A059] transition-colors">
+        <div className="flex items-center justify-between mb-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-[#A1887F] hover:text-[#C5A059] transition-colors py-2">
             <ChevronLeft size={20} />
             <span className="text-sm font-bold uppercase tracking-widest">Back</span>
           </Link>
 
           <button 
             onClick={handleShare}
-            className="p-3 bg-white border border-[#C5A059]/10 rounded-2xl shadow-sm text-[#C5A059] hover:bg-[#FDFBF7] transition-all"
+            className="p-2.5 bg-white border border-[#C5A059]/10 rounded-xl shadow-sm text-[#C5A059] hover:bg-[#FDFBF7] transition-all"
           >
-            <Share2 size={20} />
+            <Share2 size={18} />
           </button>
         </div>
 
-        {/* Section Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#3E2723]">{section.title}</h1>
-          {section.subtitle && <p className="text-sm text-[#A1887F] mt-2 font-medium">{section.subtitle}</p>}
-        </div>
+
 
         {/* Poster Image Container */}
-        <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-10">
+        <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-4">
           {section.banner_url ? (
             <div className="w-full flex justify-center bg-white">
               <img 

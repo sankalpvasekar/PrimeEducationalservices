@@ -2,8 +2,38 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, Mail, MapPin, Globe, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  const isAbout = pathname === '/about';
+
+  if (!isHome && !isAbout) return null;
+
+  if (isAbout) {
+    return (
+      <footer className="w-full bg-[#FDFBF7] border-t border-[#C5A059]/10 pt-16 pb-12 mt-auto">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+             <div className="space-y-4">
+                <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs">Contact Us</h4>
+                <div className="flex items-center gap-3">
+                   <Mail className="text-[#C5A059]" size={18} />
+                   <Link href="mailto:primeeducationalservices515@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059]">primeeducationalservices515@gmail.com</Link>
+                </div>
+                <div className="flex items-center gap-3">
+                   <MapPin className="text-[#C5A059]" size={18} />
+                   <span className="text-sm text-[#3E2723] font-bold">Pandharpur, Maharashtra</span>
+                </div>
+             </div>
+             <Image src="/footer.png" alt="Footer Logo" width={150} height={50} className="opacity-40 grayscale h-8 w-auto" />
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="w-full bg-[#FDFBF7] border-t border-[#C5A059]/10 pt-16 pb-12 mt-auto">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
@@ -61,10 +91,6 @@ export default function Footer() {
           </div>
         </div>
 
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-[#C5A059]/10 text-center">
-         <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-[0.3em]">&copy; 2026 Prime Educational Services.</p>
       </div>
     </footer>
   );
