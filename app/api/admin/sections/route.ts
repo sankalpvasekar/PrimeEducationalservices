@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const result = await query(
       'INSERT INTO exam_categories (title, subtitle, banner_url, price) VALUES ($1, $2, $3, $4) RETURNING id',
-      [title, subtitle || '', banner_url || '', price || 499.00]
+      [title, subtitle || '', banner_url || '', price ?? 499.00]
     );
 
     return NextResponse.json({ success: true, sectionId: (result as any)[0].id });
@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest) {
 
     await query(
       'UPDATE exam_categories SET title = $1, subtitle = $2, price = $3 WHERE id = $4',
-      [title, subtitle || '', price || 499.00, sectionId]
+      [title, subtitle || '', price ?? 499.00, sectionId]
     );
 
     return NextResponse.json({ success: true, message: 'Section updated successfully' });

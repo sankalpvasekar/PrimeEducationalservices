@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, url: fileUrl, message: 'Banner updated!' });
     } else if (type === 'pdf') {
       await query(
-        'INSERT INTO pdfs (section_id, title, price, cloudinary_url) VALUES ($1, $2, $3, $4)',
-        [sectionId, title || 'Untitled', price || 0, fileUrl]
+        'INSERT INTO pdfs (section_id, title, cloudinary_url) VALUES ($1, $2, $3)',
+        [sectionId, title || 'Untitled', fileUrl]
       );
       return NextResponse.json({ success: true, url: fileUrl, message: 'PDF uploaded!' });
     }

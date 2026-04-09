@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     if (!sectionId) return NextResponse.json({ error: 'Section ID required' }, { status: 400 });
 
-    const pdfs = await query('SELECT id, title, price, cloudinary_url, created_at FROM pdfs WHERE section_id = $1 ORDER BY created_at DESC', [sectionId]);
+    const pdfs = await query('SELECT id, title, cloudinary_url, created_at FROM pdfs WHERE section_id = $1 ORDER BY created_at DESC', [sectionId]);
 
     return NextResponse.json({ success: true, pdfs });
   } catch (err) {
@@ -52,12 +52,12 @@ export async function PATCH(req: NextRequest) {
     const payload = verifyToken(token);
     if (!payload || !payload.isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const { pdfId, title, price } = await req.json();
+    const { pdfId, title } = await req.json();
     if (!pdfId) return NextResponse.json({ error: 'PDF ID required' }, { status: 400 });
 
     await query(
-      'UPDATE pdfs SET title = COALESCE($1, title), price = COALESCE($2, price) WHERE id = $3',
-      [title, price, pdfId]
+      'UPDATE pdfs SET title = COALESCE($1, title) WHERE id = $2',
+      [title, pdfId]
     );
 
     return NextResponse.json({ success: true, message: 'PDF updated successfully' });

@@ -102,6 +102,7 @@ export async function initDB() {
       subtitle VARCHAR(255),
       description TEXT,
       banner_url TEXT,
+      price DECIMAL(10, 2) DEFAULT 499.00,
       is_premium BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT NOW()
     );

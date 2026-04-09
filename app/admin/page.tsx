@@ -55,13 +55,11 @@ export default function AdminDashboard() {
   // Form states
   const [newSec, setNewSec] = useState({ title: '', subtitle: '', banner_url: '' });
   const [pdfTitle, setPdfTitle] = useState('');
-  const [pdfPrice, setPdfPrice] = useState('499');
   const [editTitle, setEditTitle] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
   const [editPrice, setEditPrice] = useState('499');
   const [editingPdfId, setEditingPdfId] = useState<number | null>(null);
   const [editPdfTitle, setEditPdfTitle] = useState('');
-  const [editPdfPrice, setEditPdfPrice] = useState('');
   const [pendingPdf, setPendingPdf] = useState<File | null>(null);
 
   const handleFatalAuth = useCallback(() => {
@@ -110,7 +108,7 @@ export default function AdminDashboard() {
       if (cat) {
          setEditTitle(cat.title);
          setEditSubtitle(cat.subtitle || '');
-         setEditPrice(cat.price?.toString() || '499');
+         setEditPrice(cat.price !== null && cat.price !== undefined ? cat.price.toString() : '499');
       }
       fetch(`/api/admin/pdfs?sectionId=${selectedCat}`)
         .then(res => res.json())
@@ -143,7 +141,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/sections', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sectionId: selectedCat, title: editTitle, subtitle: editSubtitle, price: parseFloat(editPrice) })
+        body: JSON.stringify({ sectionId: selectedCat, title: editTitle, subtitle: editSubtitle, price: parseInt(editPrice) || 0 })
       });
       if (res.ok) {
         toast.success('Section metadata updated');
@@ -239,7 +237,6 @@ export default function AdminDashboard() {
           sectionId: selectedCat,
           type: 'pdf',
           title: pdfTitle,
-          price: pdfPrice,
           fileUrl: cldData.secure_url
         })
       });
@@ -284,7 +281,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/pdfs', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdfId, title: editPdfTitle, price: editPdfPrice })
+        body: JSON.stringify({ pdfId, title: editPdfTitle })
       });
       if (res.ok) {
         toast.success('PDF updated');
@@ -303,7 +300,6 @@ export default function AdminDashboard() {
   const startEditingPdf = (pdf: Pdf) => {
     setEditingPdfId(pdf.id);
     setEditPdfTitle(pdf.title);
-    setEditPdfPrice(pdf.price);
   };
 
   const handleDeletePdf = async (pdfId: number) => {
@@ -442,11 +438,14 @@ export default function AdminDashboard() {
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest pl-1">Section Price (₹)</label>
                         <input 
-                          type="number" className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-2xl px-5 py-3.5 text-sm text-[#5D4037] font-bold focus:border-[#C5A059]/40 focus:ring-4 focus:ring-[#C5A059]/5 transition-all outline-none" 
+                          type="text" className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-2xl px-5 py-3.5 text-sm text-[#5D4037] font-bold focus:border-[#C5A059]/40 focus:ring-4 focus:ring-[#C5A059]/5 transition-all outline-none" 
                           value={editPrice} 
-                          onChange={e => setEditPrice(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setEditPrice(val);
+                          }}
                           onBlur={handleUpdateSection}
-                          placeholder="0.00"
+                          placeholder="499"
                         />
                       </div>
                     </div>
@@ -509,15 +508,10 @@ export default function AdminDashboard() {
                                     className="w-full bg-white border border-[#C5A059]/30 rounded-lg px-2 py-1 text-sm font-bold text-[#5D4037] outline-none"
                                     value={editPdfTitle} onChange={e => setEditPdfTitle(e.target.value)}
                                   />
-                                  <input 
-                                    type="number" className="w-24 bg-white border border-[#C5A059]/30 rounded-lg px-2 py-1 text-xs text-[#A1887F] outline-none"
-                                    value={editPdfPrice} onChange={e => setEditPdfPrice(e.target.value)}
-                                  />
                                 </div>
                               ) : (
                                 <>
                                   <p className="text-sm font-bold text-[#5D4037] truncate">{pdf.title}</p>
-                                  <p className="text-[11px] font-bold text-[#A1887F] mt-0.5">₹{pdf.price}</p>
                                 </>
                               )}
                             </div>
@@ -560,14 +554,7 @@ export default function AdminDashboard() {
 
                          <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-2">
-                              <div className="flex-1">
-                                <label className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest pl-1">Price (₹)</label>
-                                <input 
-                                  type="number" className="w-full bg-[#FDFBF7] border border-[#C5A059]/10 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
-                                  value={pdfPrice} onChange={e => setPdfPrice(e.target.value)}
-                                />
-                              </div>
-                              <div className="flex-1 mt-4">
+                             <div className="flex-1 mt-4">
                                 <label className={`w-full py-2.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all border-2 border-dashed ${pendingPdf ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-[#C5A059]/20 text-[#A1887F] hover:bg-[#FDFBF7]'}`}>
                                   {pendingPdf ? <CheckCircle2 size={14} /> : <FileText size={14} />} 
                                   <span className="text-[11px] font-bold truncate max-w-[100px]">
