@@ -209,7 +209,7 @@ export default function SectionPage() {
              onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
           >
              {processingPayment ? <Loader2 className="animate-spin" /> : null}
-             {isPurchased ? 'Go To PDF (Unlocked)' : `Buy Now — ₹${section.price || 499}`}
+             {isPurchased ? 'Go To PDF (Unlocked)' : `Buy Now — ₹${section.price ?? 499}`}
           </button>
 
           <div className="flex items-center gap-6 text-[#A1887F]/40">
