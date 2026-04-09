@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const payload = verifyToken(token);
     if (!payload || !payload.isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const categories = await query('SELECT id, title, subtitle, banner_url FROM exam_categories ORDER BY id ASC');
+    const categories = await query('SELECT id, title, subtitle, banner_url, price FROM exam_categories ORDER BY id ASC');
 
     return NextResponse.json({ success: true, categories });
   } catch (err) {
