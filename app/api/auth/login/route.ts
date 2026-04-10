@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
       // Generate session for Superuser
       const deviceId = clientDeviceId || uuidv4();
-      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
       const token = signToken({ userId: admin.id, email: admin.email, name: 'Super Admin', isAdmin: true, deviceId });
 
       await query('UPDATE sessions SET is_active = false WHERE user_id = $1', [admin.id]);
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60,
+        maxAge: 365 * 24 * 60 * 60,
         path: '/',
       });
 
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     await query('UPDATE sessions SET is_active = false WHERE user_id = $1', [user.id]);
 
     // 6. Create new session
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 365 days
     const token = signToken({ userId: user.id, email: user.email, name: user.name, isAdmin: user.is_admin, deviceId });
 
     await query(
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: 365 * 24 * 60 * 60,
       path: '/',
     });
 
