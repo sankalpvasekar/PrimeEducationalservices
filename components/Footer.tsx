@@ -14,20 +14,25 @@ export default function Footer() {
   if (isAbout) {
     return (
       <footer className="w-full bg-[#FDFBF7] border-t border-[#C5A059]/10 pt-16 pb-12 mt-auto">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="flex flex-col items-center gap-6">
+             <Image src="/footer.png" alt="Footer Logo" width={180} height={60} className="opacity-80 h-10 w-auto" />
+             
              <div className="space-y-4">
                 <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs">Contact Us</h4>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 justify-center">
                    <Mail className="text-[#C5A059]" size={18} />
-                   <Link href="mailto:primeeducationalservices515@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059]">primeeducationalservices515@gmail.com</Link>
-                </div>
-                <div className="flex items-center gap-3">
-                   <MapPin className="text-[#C5A059]" size={18} />
-                   <span className="text-sm text-[#3E2723] font-bold">Pandharpur, Maharashtra</span>
+                   <Link href="mailto:primeeducationalservices515@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059] transition-colors">
+                     primeeducationalservices515@gmail.com
+                   </Link>
                 </div>
              </div>
-             <Image src="/footer.png" alt="Footer Logo" width={150} height={50} className="opacity-40 grayscale h-8 w-auto" />
+
+             <div className="h-px w-12 bg-[#C5A059]/20"></div>
+             
+             <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest">
+                Premium Study Portal • Prime Educational Services
+             </p>
           </div>
         </div>
       </footer>
@@ -36,10 +41,10 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-[#FDFBF7] border-t border-[#C5A059]/10 pt-16 pb-12 mt-auto">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12 text-left">
         
         {/* Column 1: Brand & Bio */}
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-sm">
           <Image src="/footer.png" alt="Footer Logo" width={180} height={60} className="opacity-80 h-10 w-auto" />
           <p className="text-sm text-[#A1887F] font-medium leading-relaxed">
             The vintage haven for premium study notes and expert-curated materials. Master UPSC, MPSC, and 12+ other categories.
@@ -51,28 +56,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Column 2: Navigation */}
-        <div>
-          <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs mb-6">Quick Links</h4>
-          <ul className="space-y-4">
-            <li><Link href="/" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Home Library</Link></li>
-            <li><Link href="/about" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Our Story (About)</Link></li>
-            <li><Link href="/contact" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Contact Support</Link></li>
-          </ul>
-        </div>
-
-        {/* Column 3: Policies */}
-        <div>
-          <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs mb-6">Policies</h4>
-          <ul className="space-y-4">
-            <li><Link href="/terms" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Terms of Service</Link></li>
-            <li><Link href="/privacy" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/shipping-policy" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Shipping Policy</Link></li>
-            <li><Link href="/cancellation" className="text-sm text-[#A1887F] font-medium hover:text-[#C5A059] transition-colors">Cancellation & Refund</Link></li>
-          </ul>
-        </div>
-
-        {/* Column 4: Contact Us */}
+        {/* Column 2: Contact Us */}
         <div className="space-y-4">
           <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs mb-6">Contact Us</h4>
           <div className="flex items-start gap-3">
@@ -82,12 +66,10 @@ export default function Footer() {
                <Link href="mailto:primeeducationalservices515@gmail.com" className="text-sm text-[#3E2723] font-bold hover:text-[#C5A059] transition-colors">primeeducationalservices515@gmail.com</Link>
              </div>
           </div>
-          <div className="flex items-start gap-3">
-             <MapPin className="text-[#C5A059] shrink-0" size={18} />
-             <div className="flex flex-col">
-               <span className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest">Location</span>
-               <span className="text-sm text-[#3E2723] font-bold">Pandharpur, Maharashtra</span>
-             </div>
+          <div className="mt-8 pt-8 border-t border-[#C5A059]/10">
+             <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-widest">
+                Dedicated to Educational Excellence
+             </p>
           </div>
         </div>
 

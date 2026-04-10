@@ -205,11 +205,16 @@ export default function SectionPage() {
         <div className="flex flex-col items-center gap-8">
           <button 
              disabled={processingPayment}
-             className="w-full py-4 md:py-5 bg-[#C5A059] text-white rounded-[2rem] font-bold text-xl md:text-2xl hover:bg-[#A68344] transition-all shadow-[0_15px_35px_-5px_rgba(197,160,89,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
+             className="w-full py-4 md:py-5 bg-gradient-to-b from-[#4CAF50] to-[#2E7D32] text-white rounded-[2rem] font-bold shadow-[0_15px_35px_-5px_rgba(46,125,50,0.4)] active:scale-[0.98] flex flex-col items-center justify-center gap-0 disabled:opacity-50"
              onClick={isPurchased ? () => router.push(`/curriculum/${id}`) : handlePayment}
           >
-             {processingPayment ? <Loader2 className="animate-spin" /> : null}
-             {isPurchased ? 'Go To PDF (Unlocked)' : `Buy Now — ₹${section.price ?? 499}`}
+             {processingPayment ? <Loader2 className="animate-spin mb-1" /> : null}
+             <span className="text-xl md:text-2xl">
+               {isPurchased ? 'Go To PDF (Unlocked)' : `Buy Now — ₹${section.price ?? 499} Only`}
+             </span>
+             <span className="text-[12px] md:text-sm uppercase tracking-widest opacity-90 font-medium">
+               Limited Time Offer
+             </span>
           </button>
 
           <div className="flex items-center gap-6 text-[#A1887F]/40">
