@@ -9,7 +9,7 @@ export default function SecurePDF({ url }: { url: string }) {
   
   useEffect(() => {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+      `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     
     let isMounted = true;
     const loadPDF = async () => {
