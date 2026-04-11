@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         u.name as customer_name, 
         u.email as customer_email, 
         c.title as section_title, 
-        o.amount, 
+        COALESCE(o.amount, c.price) as amount, 
         o.status, 
         o.created_at
       FROM purchases o
