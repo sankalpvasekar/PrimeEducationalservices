@@ -37,7 +37,7 @@ export default function SectionPage() {
 
   const fetchSection = async () => {
     try {
-      const res = await fetch(`/api/sections/${id}`);
+      const res = await fetch(`/api/sections/${id}`, { cache: 'no-store' });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
       

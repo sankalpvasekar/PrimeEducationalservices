@@ -661,7 +661,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-[#A1887F] font-medium">{o.customer_email}</p>
                       </td>
                       <td className="px-8 py-6"><span className="text-xs font-bold text-[#5D4037]">{o.section_title}</span></td>
-                      <td className="px-8 py-6 text-right"><p className="font-serif font-black text-[#5D4037] text-xl">₹{o.amount}</p></td>
+                      <td className="px-8 py-6 text-right"><p className="font-serif font-black text-[#5D4037] text-xl">₹{o.amount || '0'}</p></td>
                     </tr>
                   ))}
                   {orders.length === 0 && (
