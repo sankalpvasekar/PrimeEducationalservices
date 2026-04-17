@@ -17,6 +17,7 @@ interface PDF {
   id: number;
   title: string;
   price: number;
+  cloudinary_url: string;
 }
 
 export default function CurriculumPage() {
@@ -79,13 +80,41 @@ export default function CurriculumPage() {
                pdfs.map((pdf, idx) => (
                  <div 
                    key={pdf.id} 
-                   className="cursor-pointer"
-                   onClick={() => router.push(`/view/${pdf.id}`)}
+                   className="group relative bg-[#075E54]/5 rounded-xl border border-[#075E54]/10 overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col"
                  >
-                   <div className="bg-[#FFFBF2] rounded-2xl border-2 border-[#C5A059] shadow-sm p-6 text-center transition-all duration-300 hover:border-[#C5A059]/40 hover:shadow-md hover:-translate-y-1 active:scale-[0.98]">
-                     <h3 className="text-xl font-bold text-[#3E2723] leading-tight">{pdf.title}</h3>
-                     <p className="text-[10px] text-[#A1887F] font-bold uppercase tracking-wider mt-2">Study Material • Unlocked</p>
-                   </div>
+                    {/* PDF Thumbnail Preview */}
+                    <div className="aspect-[4/3] bg-white relative overflow-hidden flex items-center justify-center p-4">
+                        <img 
+                          src={pdf.cloudinary_url?.replace('/upload/', '/upload/pg_1,c_fill,h_400,w_600/') + '.jpg'} 
+                          alt={pdf.title}
+                          className="w-full h-full object-contain shadow-sm rounded-sm border border-gray-100"
+                          onError={(e) => {
+                             (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/dffu9zh9p/image/upload/v1741168019/kntu3as6qreit7v7uay6.png'; // Placeholder if thumbnail fails
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                    </div>
+
+                    {/* Metadata Detail Section (WhatsApp Style) */}
+                    <div className="bg-[#075E54] p-3 flex items-center gap-3">
+                        <div className="bg-[#FF1744] p-2 rounded flex-shrink-0">
+                           <FileText className="text-white" size={20} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                           <h3 className="text-white text-sm font-semibold truncate leading-tight">{pdf.title}</h3>
+                           <p className="text-white/70 text-[10px] uppercase tracking-wider mt-0.5">PDF • Unlocked • Study Material</p>
+                        </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="p-3 bg-white border-t border-gray-50">
+                        <button 
+                          onClick={() => router.push(`/view/${pdf.id}`)}
+                          className="w-full py-2.5 bg-[#075E54] hover:bg-[#128C7E] text-white rounded-lg text-sm font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
+                        >
+                           <ShieldCheck size={16} /> Open Now
+                        </button>
+                    </div>
                  </div>
                ))
              ) : (

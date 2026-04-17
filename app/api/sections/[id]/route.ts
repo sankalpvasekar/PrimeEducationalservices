@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       title: string;
       price: number;
       cloudinary_url: string;
-    }>('SELECT id, title FROM pdfs WHERE section_id = $1', [sectionId]);
+    }>('SELECT id, title, cloudinary_url FROM pdfs WHERE section_id = $1', [sectionId]);
 
     // 3. Check for User Purchase (if logged in)
     let isPurchased = false;
