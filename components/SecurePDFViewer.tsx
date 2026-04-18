@@ -7,22 +7,8 @@ const SecurePDF = ({ url }: { url: string }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
-  const [watermark, setWatermark] = useState("");
   
   useEffect(() => {
-    // Get user info for watermarking
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const u = JSON.parse(storedUser);
-        setWatermark(`${u.email || u.name || 'Protected'} • ${new Date().toLocaleDateString()}`);
-      } catch (e) {
-        setWatermark("Protected Document");
-      }
-    } else {
-      setWatermark("Protected Document");
-    }
-
     // DevTools / Debugger Trap
     const trap = setInterval(() => {
       const startTime = performance.now();
@@ -77,22 +63,6 @@ const SecurePDF = ({ url }: { url: string }) => {
               canvasContext: context,
               viewport,
             }).promise;
-
-            // DRAW WATERMARK
-            const text = watermark || "SECURE CONTENT";
-            context.font = `${Math.floor(canvas.width / 20)}px Inter, sans-serif`;
-            context.fillStyle = "rgba(180, 180, 180, 0.15)";
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            
-            // Draw multiple diagonal watermarks
-            for(let y = 0; y < canvas.height; y += canvas.height/4) {
-               context.save();
-               context.translate(canvas.width / 2, y + canvas.height/8);
-               context.rotate(-Math.PI / 4);
-               context.fillText(text, 0, 0);
-               context.restore();
-            }
           }
         }
         setLoading(false);
@@ -107,7 +77,7 @@ const SecurePDF = ({ url }: { url: string }) => {
       loadPDF();
     }
     return () => { isMounted = false; };
-  }, [url, watermark]);
+  }, [url]);
 
   // Global Security Listeners & Visibility Shield
   useEffect(() => {

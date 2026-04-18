@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     icon: '/title.jpeg',
     apple: '/title.jpeg',
   },
+  manifest: '/manifest.json',
 };
 
 export const dynamic = 'force-dynamic';
