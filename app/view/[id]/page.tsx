@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { ShieldCheck } from 'lucide-react';
 
 const SecurePDF = dynamic(() => import('@/components/SecurePDFViewer'), { ssr: false });
 
-export default function Page() {
 export default function Page() {
   const { id } = useParams();
   const [url, setUrl] = useState<string | null>(null);
