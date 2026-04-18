@@ -85,7 +85,7 @@ export default function CurriculumPage() {
                     {/* PDF Thumbnail Preview */}
                     <div className="aspect-[4/3] bg-white relative overflow-hidden flex items-center justify-center p-4">
                         <img 
-                          src={pdf.cloudinary_url?.replace('/upload/', '/upload/pg_1,c_fill,h_400,w_600/') + '.jpg'} 
+                          src={pdf.cloudinary_url?.replace('/upload/', '/upload/pg_1,c_fill,h_400,w_600,f_auto/') + (pdf.cloudinary_url.endsWith('.pdf') ? '' : '.jpg')} 
                           alt={pdf.title}
                           className="w-full h-full object-contain shadow-sm rounded-sm border border-gray-100"
                           onError={(e) => {

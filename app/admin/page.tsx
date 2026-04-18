@@ -222,7 +222,7 @@ export default function AdminDashboard() {
       formData.append('signature', sigData.signature);
       formData.append('folder', 'prime-edu');
 
-      const cldRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloud_name}/raw/upload`, {
+      const cldRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloud_name}/image/upload`, {
         method: 'POST',
         body: formData,
       });
