@@ -73,56 +73,37 @@ export default function CurriculumPage() {
            </Link>
         </div>
 
-        {/* Content Modules - Redesigned to match Landing Page style */}
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+        {/* Content Modules - Single Strip Design */}
+        <div className="space-y-3">
              {pdfs.length > 0 ? (
-               pdfs.map((pdf, idx) => (
+               pdfs.map((pdf) => (
                  <div 
                    key={pdf.id} 
-                   className="group relative bg-[#075E54]/5 rounded-xl border border-[#075E54]/10 overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col"
+                   onClick={() => router.push(`/view/${pdf.id}`)}
+                   className="group relative bg-[#075E54] hover:bg-[#128C7E] rounded-xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-xl cursor-pointer flex items-center p-4 gap-4"
                  >
-                    {/* PDF Thumbnail Preview */}
-                    <div className="aspect-[4/3] bg-white relative overflow-hidden flex items-center justify-center p-4">
-                        <img 
-                          src={pdf.cloudinary_url?.replace('/upload/', '/upload/pg_1,c_fill,h_400,w_600,f_auto/') + (pdf.cloudinary_url.endsWith('.pdf') ? '' : '.jpg')} 
-                          alt={pdf.title}
-                          className="w-full h-full object-contain shadow-sm rounded-sm border border-gray-100"
-                          onError={(e) => {
-                             (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/dffu9zh9p/image/upload/v1741168019/kntu3as6qreit7v7uay6.png'; // Placeholder if thumbnail fails
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                    {/* Icon Section (Red Box) */}
+                    <div className="bg-[#FF1744] p-3 rounded-xl flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+                       <FileText className="text-white" size={24} />
                     </div>
 
-                    {/* Metadata Detail Section (WhatsApp Style) */}
-                    <div className="bg-[#075E54] p-3 flex items-center gap-3">
-                        <div className="bg-[#FF1744] p-2 rounded flex-shrink-0">
-                           <FileText className="text-white" size={20} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                           <h3 className="text-white text-sm font-semibold truncate leading-tight">{pdf.title}</h3>
-                           <p className="text-white/70 text-[10px] uppercase tracking-wider mt-0.5">PDF • Unlocked • Study Material</p>
-                        </div>
+                    {/* Metadata Section */}
+                    <div className="flex-1 min-w-0">
+                         <h3 className="text-white text-base font-bold truncate tracking-tight">{pdf.title}</h3>
+                         <p className="text-white/75 text-[10px] font-black uppercase tracking-[0.1em] mt-1">PDF • Unlocked • Study Material</p>
                     </div>
 
-                    {/* Action Button */}
-                    <div className="p-3 bg-white border-t border-gray-50">
-                        <button 
-                          onClick={() => router.push(`/view/${pdf.id}`)}
-                          className="w-full py-2.5 bg-[#075E54] hover:bg-[#128C7E] text-white rounded-lg text-sm font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
-                        >
-                           <ShieldCheck size={16} /> Open Now
-                        </button>
+                    {/* Security Visual */}
+                    <div className="flex-shrink-0 opacity-20 group-hover:opacity-100 transition-opacity pr-2">
+                       <ShieldCheck className="text-white" size={20} />
                     </div>
                  </div>
                ))
              ) : (
-               <div className="text-center py-20 bg-[#FDFBF7] rounded-[2.5rem] border-2 border-dashed border-[#C5A059]/20 sm:col-span-2">
+               <div className="text-center py-20 bg-[#FDFBF7] rounded-[2.5rem] border-2 border-dashed border-[#C5A059]/20">
                   <p className="text-[#A1887F] font-medium italic">No materials found in this section yet.</p>
                </div>
              )}
-          </div>
         </div>
 
       </main>
