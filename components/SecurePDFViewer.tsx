@@ -2,11 +2,41 @@
 import { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 
-export default function SecurePDF({ url }: { url: string }) {
+const SecurePDF = ({ url }: { url: string }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBlurred, setIsBlurred] = useState(false);
+  const [watermark, setWatermark] = useState("");
   
+  useEffect(() => {
+    // Get user info for watermarking
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        setWatermark(`${u.email || u.name || 'Protected'} • ${new Date().toLocaleDateString()}`);
+      } catch (e) {
+        setWatermark("Protected Document");
+      }
+    } else {
+      setWatermark("Protected Document");
+    }
+
+    // DevTools / Debugger Trap
+    const trap = setInterval(() => {
+      const startTime = performance.now();
+      debugger;
+      const endTime = performance.now();
+      if (endTime - startTime > 100) {
+        // DevTools likely open
+        setIsBlurred(true);
+      }
+    }, 2000);
+
+    return () => clearInterval(trap);
+  }, []);
+
   useEffect(() => {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -26,7 +56,6 @@ export default function SecurePDF({ url }: { url: string }) {
         if (!container) return;
         container.innerHTML = ''; 
 
-        // Sequential rendering for mobile stability
         for (let i = 1; i <= pdf.numPages; i++) {
           if (!isMounted) break;
           const page = await pdf.getPage(i);
@@ -37,7 +66,6 @@ export default function SecurePDF({ url }: { url: string }) {
 
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          // Security: pointer-events-none prevents interaction with the canvas content
           canvas.className = "mb-4 bg-white shadow-lg mx-auto max-w-full h-auto pointer-events-none select-none touch-none";
           canvas.style.userSelect = "none";
           canvas.style.webkitUserSelect = "none";
@@ -49,12 +77,28 @@ export default function SecurePDF({ url }: { url: string }) {
               canvasContext: context,
               viewport,
             }).promise;
+
+            // DRAW WATERMARK
+            const text = watermark || "SECURE CONTENT";
+            context.font = `${Math.floor(canvas.width / 20)}px Inter, sans-serif`;
+            context.fillStyle = "rgba(180, 180, 180, 0.15)";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            
+            // Draw multiple diagonal watermarks
+            for(let y = 0; y < canvas.height; y += canvas.height/4) {
+               context.save();
+               context.translate(canvas.width / 2, y + canvas.height/8);
+               context.rotate(-Math.PI / 4);
+               context.fillText(text, 0, 0);
+               context.restore();
+            }
           }
         }
         setLoading(false);
       } catch (err: any) {
         console.error('PDF.js Error:', err);
-        setError("Failed to load secure document. Please refresh.");
+        setError("Security verification failed. Please refresh.");
         setLoading(false);
       }
     };
@@ -63,15 +107,24 @@ export default function SecurePDF({ url }: { url: string }) {
       loadPDF();
     }
     return () => { isMounted = false; };
-  }, [url]);
+  }, [url, watermark]);
 
-  // Global Security Listeners
+  // Global Security Listeners & Visibility Shield
   useEffect(() => {
-    // Disable right click and selection
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     const preventDefault = (e: any) => e.preventDefault();
     
-    // Block shortcuts (Desktop)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        setIsBlurred(true);
+      } else {
+        // Optional: Keep it blacked out until focus returns
+      }
+    };
+
+    const handleBlur = () => setIsBlurred(true);
+    const handleFocus = () => setIsBlurred(false);
+
     const handleKey = (e: KeyboardEvent) => {
       if (
         e.key === "PrintScreen" || e.key === "F12" ||
@@ -79,13 +132,9 @@ export default function SecurePDF({ url }: { url: string }) {
         (e.ctrlKey && e.shiftKey && ["I", "J", "C", "K"].includes(e.key.toUpperCase()))
       ) {
         e.preventDefault();
+        setIsBlurred(true);
         return false;
       }
-    };
-
-    // Mobile: Prevent long-press selection menu globally
-    const handleTouchStart = (e: TouchEvent) => {
-       // Allow natural scrolling but block persistent touches that trigger menus
     };
 
     document.addEventListener("contextmenu", handleContextMenu);
@@ -93,7 +142,10 @@ export default function SecurePDF({ url }: { url: string }) {
     document.addEventListener("cut", preventDefault);
     document.addEventListener("dragstart", preventDefault);
     window.addEventListener("keydown", handleKey);
-    // iOS specific touch protection prefix
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+
     (document.body.style as any).webkitTouchCallout = "none";
     (document.body.style as any).webkitUserSelect = "none";
 
@@ -103,28 +155,51 @@ export default function SecurePDF({ url }: { url: string }) {
       document.removeEventListener("cut", preventDefault);
       document.removeEventListener("dragstart", preventDefault);
       window.removeEventListener("keydown", handleKey);
-      (document.body.style as any).webkitTouchCallout = "default";
-      (document.body.style as any).webkitUserSelect = "text";
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 
   return (
     <div 
-      className="min-h-screen bg-[#1A1A1A] flex flex-col items-center py-4 sm:py-8 w-full overflow-y-auto"
+      className="relative min-h-screen bg-[#1A1A1A] flex flex-col items-center py-4 sm:py-8 w-full overflow-y-auto"
       style={{
         userSelect: "none",
         WebkitUserSelect: "none",
         WebkitTouchCallout: "none",
-        touchAction: "pan-y" // Allow vertical scrolling but block other touch actions
+        touchAction: "pan-y"
       }}
     >
+      {/* BLACKOUT OVERLAY */}
+      {isBlurred && (
+        <div className="fixed inset-0 bg-black z-[99999] flex flex-col items-center justify-center text-center p-6 select-none">
+           <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
+              <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                 <div className="w-8 h-8 rounded-full border-4 border-red-500 border-t-transparent animate-spin" />
+              </div>
+              <h2 className="text-white text-xl font-bold mb-2">Security Shield Active</h2>
+              <p className="text-gray-400 text-sm max-w-xs mx-auto">
+                Screen capture or inspection detected. Focus the window to resume protected viewing.
+              </p>
+           </div>
+        </div>
+      )}
+
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50">
            <p className="text-[#C5A059] font-bold animate-pulse text-sm uppercase tracking-widest">Securing Document...</p>
         </div>
       )}
+      
       {error && <p className="text-red-400 mt-10">{error}</p>}
-      <div ref={containerRef} className="flex flex-col items-center w-full max-w-screen-lg px-2 sm:px-4" />
+      
+      <div 
+        ref={containerRef} 
+        className={`flex flex-col items-center w-full max-w-screen-lg px-2 sm:px-4 transition-all duration-500 ${isBlurred ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`} 
+      />
     </div>
   );
-}
+};
+
+export default SecurePDF;
