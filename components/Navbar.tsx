@@ -64,14 +64,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-5 h-full flex justify-between items-center">
         {/* LOGO - SLIMMER */}
         <Link href={user?.isAdmin ? "/admin" : "/"} className="transition-opacity hover:opacity-80">
-          <Image 
-            src="/navbar.png" 
-            alt="Logo" 
-            width={150} 
-            height={36} 
-            priority 
-            className="h-9 w-auto object-contain"
-          />
+          <div className="flex items-center font-black text-xl md:text-2xl tracking-tighter">
+            <span className="text-blue-600">PRIME</span>
+            <span className="text-orange-500 mx-1.5 text-lg md:text-xl transform scale-y-110">EDUCATIONAL</span>
+            <span className="text-green-600">SERVICES</span>
+          </div>
         </Link>
 
         {/* DESKTOP MENU - COMPACT */}

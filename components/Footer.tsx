@@ -16,7 +16,11 @@ export default function Footer() {
       <footer className="w-full bg-[#FDFBF7] border-t border-[#C5A059]/10 pt-16 pb-12 mt-auto">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex flex-col items-center gap-6">
-             <Image src="/footer.png" alt="Footer Logo" width={180} height={60} className="opacity-80 h-10 w-auto" />
+             <div className="flex items-center font-black text-2xl md:text-3xl tracking-tighter cursor-default">
+               <span className="text-blue-600">PRIME</span>
+               <span className="text-orange-500 mx-1.5 text-xl md:text-2xl transform scale-y-110">EDUCATIONAL</span>
+               <span className="text-green-600">SERVICES</span>
+             </div>
              
              <div className="space-y-4">
                 <h4 className="text-[#3E2723] font-bold uppercase tracking-widest text-xs">Contact Us</h4>
@@ -45,7 +49,11 @@ export default function Footer() {
         
         {/* Column 1: Brand & Bio */}
         <div className="space-y-6 max-w-sm">
-          <Image src="/footer.png" alt="Footer Logo" width={180} height={60} className="opacity-80 h-10 w-auto" />
+          <div className="flex items-center font-black text-2xl md:text-3xl tracking-tighter cursor-default">
+            <span className="text-blue-600">PRIME</span>
+            <span className="text-orange-500 mx-1.5 text-xl md:text-2xl transform scale-y-110">EDUCATIONAL</span>
+            <span className="text-green-600">SERVICES</span>
+          </div>
           <p className="text-sm text-[#A1887F] font-medium leading-relaxed">
             The vintage haven for premium study notes and expert-curated materials. Master UPSC, MPSC, and 12+ other categories.
           </p>
