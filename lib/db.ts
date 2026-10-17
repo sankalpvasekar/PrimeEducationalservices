@@ -131,6 +131,14 @@ export async function initDB() {
     );
   `);
 
+  await query(`
+    CREATE TABLE IF NOT EXISTS site_content (
+      key VARCHAR(50) PRIMARY KEY,
+      content TEXT NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+  `);
+
   // Seed exam categories if empty
   const existing = await query('SELECT id FROM exam_categories LIMIT 1');
   if (existing.length === 0) {

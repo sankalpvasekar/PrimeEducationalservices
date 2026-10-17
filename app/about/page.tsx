@@ -1,8 +1,26 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { BookOpen, Users, Clock, Globe } from 'lucide-react';
 
 export default function AboutPage() {
+  const [content, setContent] = useState('');
+  useEffect(() => {
+    fetch('/api/admin/content?key=about')
+      .then(res => res.json())
+      .then(data => setContent(data.content));
+  }, []);
+
+  if (content) {
+    return (
+      <div className="flex-1 bg-[#FDFBF7] py-16 px-6 lg:py-24">
+        <div className="max-w-4xl mx-auto prose prose-brown text-[#5D4037]">
+          <pre className="whitespace-pre-wrap">{content}</pre>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 bg-[#FDFBF7] py-16 px-6 lg:py-24">
       <div className="max-w-4xl mx-auto">
