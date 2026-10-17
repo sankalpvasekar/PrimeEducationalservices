@@ -42,11 +42,13 @@ interface Order {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'content' | 'users' | 'orders'>('content');
+  const [activeTab, setActiveTab] = useState<'content' | 'users' | 'orders' | 'about' | 'disclaimer'>('content');
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [orders, setOrderData] = useState<Order[]>([]);
   const [pdfs, setPdfs] = useState<Pdf[]>([]);
+  const [aboutContent, setAboutContent] = useState('');
+  const [disclaimerContent, setDisclaimerContent] = useState('');
   const [selectedCat, setSelectedCat] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -92,6 +94,14 @@ export default function AdminDashboard() {
         if (res.status === 401 || res.status === 403) { handleFatalAuth(); return; }
         const data = await res.json();
         setOrderData(data.orders || []);
+      } else if (activeTab === 'about') {
+        const res = await fetch('/api/admin/content?key=about');
+        const data = await res.json();
+        setAboutContent(data.content || '');
+      } else if (activeTab === 'disclaimer') {
+        const res = await fetch('/api/admin/content?key=disclaimer');
+        const data = await res.json();
+        setDisclaimerContent(data.content || '');
       }
     } catch (err) {
       toast.error('Failed to load data');
@@ -338,12 +348,12 @@ export default function AdminDashboard() {
             </h1>
           </div>
           
-          <div className="flex p-1 bg-white border border-[#C5A059]/10 rounded-2xl shadow-sm">
-            {(['content', 'users', 'orders'] as const).map(tab => (
+          <div className="flex p-1 bg-white border border-[#C5A059]/10 rounded-2xl shadow-sm overflow-x-auto w-full md:w-auto scrollbar-hide">
+            {(['content', 'users', 'orders', 'about', 'disclaimer'] as const).map(tab => (
               <button 
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-[#5D4037] text-white shadow-lg' : 'text-[#A1887F] hover:text-[#5D4037]'}`}
+                className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-[#5D4037] text-white shadow-lg' : 'text-[#A1887F] hover:text-[#5D4037]'}`}
               >
                 {tab}
               </button>
@@ -671,6 +681,31 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
+        )}
+
+        {(activeTab === 'about' || activeTab === 'disclaimer') && (
+           <div className="bg-white rounded-[2.5rem] border border-[#C5A059]/20 p-8 shadow-xl animate-in fade-in slide-in-from-bottom-4">
+             <h2 className="text-xl font-bold text-[#5D4037] mb-6 capitalize">{activeTab} Page Content</h2>
+             <textarea 
+               value={activeTab === 'about' ? aboutContent : disclaimerContent}
+               onChange={(e) => activeTab === 'about' ? setAboutContent(e.target.value) : setDisclaimerContent(e.target.value)}
+               className="w-full h-96 p-4 border border-[#C5A059]/20 rounded-xl focus:outline-none focus:border-[#C5A059]"
+             />
+             <button 
+               onClick={async () => {
+                 const content = activeTab === 'about' ? aboutContent : disclaimerContent;
+                 await fetch('/api/admin/content', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({ key: activeTab, content })
+                 });
+                 toast.success('Content saved');
+               }}
+               className="mt-4 bg-[#5D4037] text-white px-6 py-2 rounded-xl"
+             >
+               Save Content
+             </button>
+           </div>
         )}
       </div>
     </div>
